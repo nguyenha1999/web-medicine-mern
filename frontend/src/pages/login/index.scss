@@ -1,0 +1,30 @@
+.wraper {
+  background: #f6f6f6;
+  height: 100vh;
+  padding-top: 100px;
+}
+.bg-image {
+  background: url("https:/deo.shopeemobile.com/shopee/shopee-seller-live-sg/rootpages/static/modules/account/image/login-img.9347138.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 100%;
+}
+
+.form-login {
+  position: relative;
+  z-index: 99;
+}
+
+.bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.ant-card {
+  padding: 12px !important;
+  margin: 12px !important;
+}

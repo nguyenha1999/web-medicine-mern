@@ -1,0 +1,19 @@
+doctype html
+html
+    head
+        title Home page
+    body
+        h1=Upload
+        form(action="/upload" method="POST" encType="multipart/form-data")
+            input(type="file" name="fileUpload")
+            input(type="file" name="my_profile_pic")
+            input(type="text" name="testField")
+            input(type="submit" value="Upload")
+        form(action="/api/login" method="POST")
+            input(type="text" name="username")
+            input(type="password" name="password")
+            input(type="submit" value="Login")
+        h1=message
+        p=sum
+        p=a
+        p=secret  
