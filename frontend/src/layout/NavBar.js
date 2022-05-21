@@ -43,9 +43,9 @@ const NavBar = (props) => {
           <NavLink to="/bill">Dự án</NavLink>
         </Menu.Item>
         <Menu.Item key="/2" icon={<FilePdfOutlined />}>
-          <NavLink to="/">Sản Phẩm</NavLink>
+          <NavLink to="/chemistries">Sản Phẩm</NavLink>
         </Menu.Item>
-        <SubMenu title="Hoá Đơn">
+        <SubMenu key="tesst" title="Hoá Đơn">
           <Menu.Item key="/import" icon={<FileAddOutlined />}>
             <NavLink to="/import">Đơn Nhập</NavLink>
           </Menu.Item>

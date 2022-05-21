@@ -15,6 +15,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization, Nonce, Signature, Timestamp, No-Cache, Client-Request'
+  );
+  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+  } else {
+    next();
+  }
+});
+
+console.log('Setup CORS successfully');
+
 setRoutes(app, './api', true, 'api');
 setRoutes(app, './controllers', false);
 

@@ -13,6 +13,7 @@ const Login = lazy(() => import("./pages/login"));
 const Profile = lazy(() => import("./pages/profile"));
 const Register = lazy(() => import("./pages/register"));
 const User = lazy(() => import("./pages/user"));
+const Home = lazy(() => import("./pages/home"));
 
 function App() {
   return (
@@ -25,6 +26,9 @@ function App() {
           <Suspense component={<Recipe />} />
         </Route>
         <Route exact path="/">
+          <Suspense component={<Home />} />
+        </Route>
+        <Route exact path="/chemistries">
           <Suspense component={<Chemistry />} />
         </Route>
         <Route exact path="/register">

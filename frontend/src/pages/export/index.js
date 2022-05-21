@@ -48,7 +48,7 @@ const Export = () => {
 
       setLoading(false);
     },
-    [pagination, search]
+    [pagination, search, setData]
   );
 
   const updateData = useCallback(
@@ -150,7 +150,7 @@ const Export = () => {
 
   useEffect(() => {
     getData();
-  }, [search, pagination.current, pagination.pageSize]);
+  }, [search, pagination.pageSize, getData]);
 
   const columns = [
     {
