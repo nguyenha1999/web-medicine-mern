@@ -51,6 +51,7 @@ const ChemistryDetail = ({ item, onOk, onCancel }) => {
           data.imageUrl = res.data;
         }
 
+        console.log(data);
         await onOk(data);
         resetImage();
       } catch (err) {

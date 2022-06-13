@@ -7,7 +7,7 @@ const ProductSchema = new Schema({
   count: Number,
   price: Number,
   calculationUnit: String,
-  createAt: { type: Date, default: Date.now() },
+  createAt: { type: Date, default: Date.now },
 });
 
 export default model("products", ProductSchema);

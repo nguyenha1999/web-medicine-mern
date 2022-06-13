@@ -1,6 +1,7 @@
 import { Button, Card, Col, Form, Input, Row } from "antd";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { create } from "../../api/user";
 
 const Signup = () => {
   const [user, setUser] = useState({
@@ -12,6 +13,12 @@ const Signup = () => {
     const name = event.target.name;
     const value = event.target.value;
     setUser({ ...user, [name]: value });
+  };
+
+  const handleSubmit = async (valueForm) => {
+    console.log(valueForm);
+    const res = await create(valueForm);
+    console.log(res);
   };
 
   return (
@@ -33,6 +40,7 @@ const Signup = () => {
                 wrapperCol={{
                   span: 16,
                 }}
+                onFinish={handleSubmit}
                 initialValues={{
                   remember: true,
                 }}
@@ -85,7 +93,7 @@ const Signup = () => {
                   />
                 </Form.Item>
                 <Form.Item
-                  name="confirm"
+                  name="repassword"
                   rules={[
                     {
                       required: true,
@@ -109,7 +117,7 @@ const Signup = () => {
                   }}
                 >
                   <Input.Password
-                    name="confirm"
+                    name="repassword"
                     placeholder="Nhập lại mật khẩu"
                     onChange={handlerInputChange}
                   />

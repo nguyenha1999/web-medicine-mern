@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { CopyOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Col, Input, message, notification, Row, Table } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -46,6 +46,10 @@ const Chemistry = () => {
     },
     [pagination, search]
   );
+
+  const handleClone = useCallback(() => {
+    message.success("Bạn đã clone Thành công nhé ");
+  }, []);
 
   const updateData = useCallback(
     async (values) => {
@@ -164,10 +168,13 @@ const Chemistry = () => {
           <Row gutter={8}>
             <Col span="auto">
               <Button
-                type="primary"
+                style={{
+                  background: "#62a73b",
+                  color: "#fff",
+                }}
                 size="small"
-                icon={<EditOutlined />}
-                onClick={() => setEditingItem(record)}
+                icon={<CopyOutlined />}
+                onClick={handleClone}
               >
                 Clone
               </Button>

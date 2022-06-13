@@ -1,9 +1,9 @@
-import { axiosClient } from "./axiosClient";
+import { axiosTest } from "./axiosClient";
 
-export const get = (params) => axiosClient.get("/home", { params });
+export const get = () => axiosTest.get("/root/home");
 
-export const create = (data) => axiosClient.post("/bills", data);
+// export const create = (data) => axiosTest.post("/bills", data);
 
-export const update = (data) => axiosClient.put(`/bills/${data._id}`, data);
+// export const update = (data) => axiosTest.put(`/bills/${data._id}`, data);
 
-export const remove = (id) => axiosClient.delete(`/bills/${id}`);
+// export const remove = (id) => axiosTest.delete(`/bills/${id}`);

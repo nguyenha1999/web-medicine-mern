@@ -34,13 +34,13 @@ const Bill = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const getData = useCallback(
-    async (page) => {
+    async (data) => {
       setLoading(true);
 
       // get data
-      const { current, pageSize } = pagination;
-      const res = await get(page || current, pageSize, search);
-      setData(res?.data?.items || []);
+      // const { current, pageSize } = pagination;
+      const res = await get(data);
+      setData(res?.data || []);
       setPagination({
         ...pagination,
         total: res?.data?.total || 0,

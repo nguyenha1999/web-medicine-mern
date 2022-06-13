@@ -1,17 +1,12 @@
-import Mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const { Schema, model } = Mongoose;
-
-const BillSchema = new Schema({
+const BillSchema = new mongoose.Schema({
   name: String,
   isExport: Boolean,
   nameCompany: String,
   staff: String,
-  product: String,
-  createAt: { type: Date, default: Date.now() },
+  product: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Chemistries" }],
+  createdAt: { type: Date, default: Date.now },
 });
 
-const a = new BillSchema({ name: "Lee nGOC hA" });
-console.log(a);
-
-export default model("bills", BillSchema);
+module.exports = mongoose.model("bills", BillSchema);

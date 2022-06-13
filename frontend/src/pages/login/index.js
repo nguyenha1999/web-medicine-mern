@@ -2,6 +2,7 @@
 import { Button, Card, Checkbox, Col, Form, Input, message, Row } from "antd";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { login } from "../../api/user";
 import "./index.scss";
 
 const Login = () => {
@@ -12,28 +13,21 @@ const Login = () => {
   const history = useHistory();
 
   const handlerInputChange = (event) => {
-    const name = event.target.name;
+    const username = event.target.name;
     const value = event.target.value;
-    setUser({ ...user, [name]: value });
+    setUser({ ...user, [username]: value });
   };
 
-  console.log(user);
+  const submit = async (valueForm) => {
+    const datas = { ...valueForm };
+    const res = await login(datas);
+    const { data } = res;
 
-  const submit = () => {
-    if (
-      user.email === "lengocha15999@gmail.com" &&
-      user.password === "1234567"
-    ) {
+    if (data?.user) {
       history.push("/");
-      message.success("Xin chào Lê Ngọc Hà");
-    } else if (
-      user.email === "admin@gmail.com" &&
-      user.password === "1234567"
-    ) {
-      history.push("/");
-      message.success("Bạn đã đăng nhập với quyền Admin");
+      message.success(`chào mừng bạn ${data?.user?.username}`);
     } else {
-      message.error("Sai tên Email hoặc Mật Khẩu");
+      message.error("Có lỗi xảy ra ...");
     }
   };
 
@@ -136,8 +130,8 @@ const Login = () => {
                   >
                     <Checkbox checked>Nhớ tài khoản</Checkbox>
                   </Form.Item>
-                  <a href="#" style={{ marginTop: "4px" }}>
-                    Quên mật khẩu ?
+                  <a href="/register" style={{ marginTop: "4px" }}>
+                    Bạn chưa có tài khoản?, đăng kí ngay!
                   </a>
                 </div>
 

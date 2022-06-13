@@ -1,9 +1,9 @@
-import { axiosClient } from "./axiosClient";
+import { axiosClient, axiosTest } from "./axiosClient";
 
 export const get = (page, limit, search) =>
   axiosClient.get("/chemistries", { params: { page, limit, search } });
 
-export const create = (data) => axiosClient.post("/chemistries", data);
+export const create = (data) => axiosTest.post("root/chemistry", data);
 
 export const update = (data) =>
   axiosClient.put(`/chemistries/${data._id}`, data);

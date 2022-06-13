@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { get } from "../../api/home";
 import Layout from "../../layout/layout";
 
 const Home = () => {
+  const [a, setA] = useState();
+  const getData = useCallback(async () => {
+    const b = await get();
+    setA(b?.data);
+  });
+
+  useEffect(() => {
+    getData();
+  });
+  console.log(a);
   return (
     <Layout>
-      <div>Home</div>
+      <div>{a}</div>
     </Layout>
   );
 };

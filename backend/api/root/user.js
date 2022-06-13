@@ -1,23 +1,30 @@
-const User = require('../../model/user');
-const UserHistory = require('../../model/userHistory');
-const crypto = require('crypto');
+const Users = require("../../model/user");
+const UserHistory = require("../../model/userHistory");
+const crypto = require("crypto");
 
 module.exports = {
   get_index: function () {
-    return User.find({}, '-hashedPass -salt')
+    return User.find({}, "-hashedPass -salt")
       .populate({
-        path: 'roles',
+        path: "roles",
         match: { activated: true },
-        select: 'title description'
+        select: "title description",
       })
       .lean();
   },
+  post_index: function (email, firstName, lastName, password) {
+    return Users.create({
+      email: email,
+      username: `${firstName} ${lastName}`,
+      password: password,
+    });
+  },
   put_index: function (user, reason, username) {
-    var salt = crypto.randomBytes(128).toString('base64');
+    var salt = crypto.randomBytes(128).toString("base64");
     var hashedPassword = crypto
-      .createHmac('sha256', salt)
+      .createHmac("sha256", salt)
       .update(user.hashedPass)
-      .digest('hex');
+      .digest("hex");
     user.salt = salt;
     user.hashedPass = hashedPassword;
 
@@ -30,9 +37,9 @@ module.exports = {
 
         return UserHistory({
           roleId: u._id,
-          type: 'Created',
+          type: "Created",
           reason: reason,
-          username: username
+          username: username,
         }).save();
       })
       .then((log) => {
@@ -48,9 +55,9 @@ module.exports = {
       .then((r) => {
         return UserHistory({
           userId: r._id,
-          type: activated ? 'activate' : 'disable',
+          type: activated ? "activate" : "disable",
           reason: reason,
-          username: username
+          username: username,
         }).save();
       });
   },
@@ -59,13 +66,13 @@ module.exports = {
       .then((data) => {
         return UserHistory({
           userId: user._id,
-          type: 'Update Roles',
+          type: "Update Roles",
           reason: reason,
-          username: username
+          username: username,
         }).save();
       })
       .then((log) => {
         return log.userId;
       });
-  }
+  },
 };

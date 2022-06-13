@@ -3,7 +3,7 @@ import { Layout } from "antd";
 import React, { useState } from "react";
 import HeaderComponent from "./header";
 import "./layout.css";
-import NavBar from "./NavBar";
+import NavBar from "./navbar";
 
 const LayoutComponent = (props) => {
   const [collapsed, setCollapsed] = useState(false);

@@ -40,6 +40,7 @@ const Export = () => {
       // get data
       const { current, pageSize } = pagination;
       const res = await get(page || current, pageSize, search);
+      console.log(res);
       setData(res?.data?.items || []);
       setPagination({
         ...pagination,

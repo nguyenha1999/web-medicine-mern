@@ -120,6 +120,7 @@ const BillDetail = ({ item, onOk, onCancel }) => {
         throw new Error("Product count have to be greater than 0");
       }
 
+      console.log(data);
       const result = {
         ...data,
         products: data.products.map((product) => ({
