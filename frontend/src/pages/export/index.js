@@ -151,7 +151,7 @@ const Export = () => {
 
   useEffect(() => {
     getData();
-  }, [search, pagination.pageSize, getData]);
+  }, []);
 
   const columns = [
     {

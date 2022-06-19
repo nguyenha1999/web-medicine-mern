@@ -54,6 +54,7 @@ mongoose.connection.on("disconnected", () => {
 mongoose.connect(config.mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false,
 });
 
 // To generate Admin account

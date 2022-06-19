@@ -5,19 +5,17 @@ const processIndex = (c = 5, a, b = 4, _app_secretKey) => ({
   secret: _app_secretKey,
 });
 
-function processIndexWithParams(
-  c = 5 /* first param */,
-  // second next param
-  a, /// nothongs
-  b = 4 /* second param */
-) {
-  console.log("index abc is executed");
+function processIndexWithParams(id) {
+  console.log("index abc is executed", id);
   return { c, a, b };
 }
 
 module.exports = {
   index: { func: processIndex },
-  "index/:c/:a/:b": processIndexWithParams,
+  "index/:id": processIndexWithParams,
+  "delete/:id": function (id) {
+    console.log(id);
+  },
   post_upload: {
     uploadConfig: {
       savedPath: "/uploaded",

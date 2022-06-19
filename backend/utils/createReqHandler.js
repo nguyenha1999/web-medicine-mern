@@ -1,9 +1,9 @@
-const getArgs = require('./getArgs');
-const auth = require('../middleware/auth');
-const authorize = require('../middleware/authorize');
-const fileUpload = require('./file-upload');
-const saveFilesUpload = require('../middleware/saveFilesUpload');
-const getArgVals = require('./getArgVals');
+const getArgs = require("./getArgs");
+const auth = require("../middleware/auth");
+const authorize = require("../middleware/authorize");
+const fileUpload = require("./file-upload");
+const saveFilesUpload = require("../middleware/saveFilesUpload");
+const getArgVals = require("./getArgVals");
 
 function createReqHandler(
   endPoint,
@@ -22,7 +22,7 @@ function createReqHandler(
   }
 
   // Upload files
-  if (typeof endPoint === 'object' && endPoint.uploadConfig) {
+  if (typeof endPoint === "object" && endPoint.uploadConfig) {
     const uploadConfig = endPoint.uploadConfig || {};
     handlers.push(fileUpload(uploadConfig));
     if (uploadConfig.savedPath) {
@@ -31,7 +31,7 @@ function createReqHandler(
   }
 
   const businessFunc =
-    typeof endPoint === 'function' ? endPoint : endPoint.func;
+    typeof endPoint === "function" ? endPoint : endPoint.func;
   const args = getArgs(businessFunc);
 
   handlers.push(async (req, res, next) => {

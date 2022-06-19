@@ -9,7 +9,7 @@ import "jspdf-autotable";
 import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { create, get, remove, update } from "../../api/bill";
+import { create, get, remove, update } from "../../api/import";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
 import { bill } from "../../recoils/Atoms";
@@ -33,23 +33,21 @@ const Import = () => {
   const [removeId, setRemoveId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
 
-  const getData = useCallback(
-    async (page) => {
-      setLoading(true);
+  const getData = useCallback(async (page) => {
+    setLoading(true);
 
-      // get data
-      const { current, pageSize } = pagination;
-      const res = await get(page || current, pageSize, search);
-      setData(res?.data?.items || []);
-      setPagination({
-        ...pagination,
-        total: res?.data?.total || 0,
-      });
+    // get data
+    const { current, pageSize } = pagination;
 
-      setLoading(false);
-    },
-    [pagination, search]
-  );
+    const res = await get(page || current, pageSize, search);
+    console.log(res);
+    setData(res?.data || []);
+    // setPagination({
+    //   ...pagination,
+    //   total: res?.data?.total || 0,
+    // });
+    setLoading(false);
+  }, []);
 
   const updateData = useCallback(
     async (values) => {
@@ -58,6 +56,7 @@ const Import = () => {
       const next = isEdit ? update : create;
 
       try {
+        console.log(values);
         await next(values);
         setEditingItem(null);
         notification.success({
@@ -152,7 +151,7 @@ const Import = () => {
 
   useEffect(() => {
     getData();
-  }, [search, pagination.current, pagination.pageSize]);
+  }, [search, pagination.pageSize, getData]);
 
   const columns = [
     {
@@ -171,21 +170,27 @@ const Import = () => {
       title: "Sản phẩm",
       key: "products",
       width: "30%",
-      render: (_text, record) =>
-        record.products.map((product) => (
-          <div>
-            {product.name}: {product.count}
-          </div>
-        )),
+      render: (_text, record) => {
+        Array.isArray(record.products) &&
+          record.products.length > 0 &&
+          record.products.map((product) => (
+            <div>
+              {product.name}: {product.count}
+            </div>
+          ));
+      },
     },
     {
       title: "Tổng tiền",
       key: "price",
       width: "15%",
-      render: (_text, record) =>
-        record.products
-          .map((product) => product.count * product.price)
-          .reduce((curr, pre) => curr + pre),
+      render: (_text, record) => {
+        Array.isArray(record.products) &&
+          record.products.length > 0 &&
+          record.products
+            .map((product) => product.count * product.price)
+            .reduce((curr, pre) => curr + pre);
+      },
     },
     {
       title: "Nhân viên",
@@ -274,7 +279,7 @@ const Import = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
-            rowClassName={(record) => !record.enabled && "disabled-row"}
+            // rowClassName={(record) => !record.enabled && "disabled-row"}
             // expandable={{
             //   expandedRowRender: (record) => (
             //     <div>

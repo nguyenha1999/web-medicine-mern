@@ -35,8 +35,10 @@ const Chemistry = () => {
       // get data
       const { current, pageSize } = pagination;
       const res = await get(page || current, pageSize, search);
-      console.log(res);
-      setData(res?.data.items || []);
+      console.log(res?.data);
+      const arr = res?.data.filter((e) => e.isDeleted === false);
+      console.log(arr);
+      setData(arr);
       setPagination({
         ...pagination,
         total: res?.data?.total || 0,
@@ -58,6 +60,7 @@ const Chemistry = () => {
       const next = isEdit ? update : create;
 
       try {
+        console.log(values);
         await next(values);
         setEditingItem(null);
         // notification.success({
@@ -78,7 +81,8 @@ const Chemistry = () => {
   const onRemove = useCallback(async () => {
     if (!removeId) return;
     try {
-      await remove(removeId);
+      console.log(removeId);
+      await remove({ _id: removeId, isDeleted: true });
       setRemoveId(null);
       // notification.success({
       //   message: "Remove chemistry successfully",
@@ -90,7 +94,7 @@ const Chemistry = () => {
         message: err.message,
       });
     }
-  }, [removeId, getData]);
+  }, [getData, removeId]);
 
   const onTableChange = (pagination) => setPagination(pagination);
 
@@ -102,20 +106,14 @@ const Chemistry = () => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "_id",
-      key: "_id",
-      width: "5%",
+      title: "Mã hoá chất",
+      dataIndex: "code",
+      key: "code",
     },
     {
       title: "Tên hoá chất",
       dataIndex: "name",
       key: "name",
-    },
-    {
-      title: "Mã hoá chất",
-      dataIndex: "code",
-      key: "code",
     },
     {
       title: "Sử dụng",

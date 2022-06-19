@@ -25,7 +25,7 @@ const ChemistryDetail = ({ item, onOk, onCancel }) => {
       code: item.code,
       price: item.price,
     });
-  }, [item]);
+  }, [form, item]);
 
   const resetImage = () => {
     setFile(null);

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const BillSchema = new mongoose.Schema({
+const ImportSchema = new mongoose.Schema({
   name: String,
   isExport: Boolean,
   nameCompany: String,
@@ -10,4 +10,4 @@ const BillSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("bills", BillSchema);
+module.exports = mongoose.model("imports", ImportSchema);
