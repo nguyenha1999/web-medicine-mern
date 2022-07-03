@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { get } from "../../api/home";
 import Layout from "../../layout/layout";
 
@@ -12,7 +12,7 @@ const Home = () => {
   useEffect(() => {
     getData();
   });
-  console.log(a);
+
   return (
     <Layout>
       <div>{a}</div>

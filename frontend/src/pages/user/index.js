@@ -7,12 +7,12 @@ import {
   message,
   notification,
   Row,
-  Table,
+  Table
 } from "antd";
 import "jspdf-autotable";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { create, get, remove, update } from "../../api/chemistry";
+import { create, get, remove, update } from "../../api/user";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
 import { chemistry } from "../../recoils/Atoms";
@@ -43,7 +43,7 @@ const User = () => {
       // get data
       const { current, pageSize } = pagination;
       const res = await get(page || current, pageSize, search);
-      setData(res?.data?.items || []);
+      setData(res?.data || []);
       setPagination({
         ...pagination,
         total: res?.data?.total || 0,
@@ -98,8 +98,6 @@ const User = () => {
 
   const onTableChange = (pagination) => setPagination(pagination);
 
-  console.log(color);
-
   useEffect(() => {
     getData();
   }, [search, pagination.current, pagination.pageSize]);
@@ -125,31 +123,31 @@ const User = () => {
     },
     {
       title: "Họ và tên",
-      key: "name",
-      dataIndex: "nameUser",
+      key: "username",
+      dataIndex: "username",
       width: "10%",
     },
     {
       title: "Mã Nhân Viên",
-      key: "name",
-      dataIndex: "Id",
+      key: "code",
+      dataIndex: "code",
       width: "10%",
     },
     {
       title: "Email",
       key: "email",
-      dataIndex: "emailUser",
+      dataIndex: "email",
       width: "25%",
     },
     {
       title: "Chức vụ",
-      key: "vlue",
-      dataIndex: "vlue",
+      key: "value",
+      dataIndex: "value",
       width: "15%",
     },
     {
       title: "Bộ Phận",
-      key: "staff",
+      key: "branch",
       dataIndex: "branch",
       width: "15%",
     },
@@ -224,7 +222,7 @@ const User = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
-            rowClassName={(record) => !record.enabled && "disabled-row"}
+            // rowClassName={(record) => !record.enabled && "disabled-row"}
           />
         </Col>
       </Row>

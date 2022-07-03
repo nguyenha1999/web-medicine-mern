@@ -10,8 +10,8 @@ export const bill = atom({
   key: key.BILL,
   default: [],
 });
-export const imports = atom({
-  key: key.IMPORT,
+export const ImportAtom = atom({
+  key: "ImportAtom",
   default: [],
 });
 
@@ -20,7 +20,19 @@ export const exports = atom({
   default: [],
 });
 
-export const user = atom({
-  key: key.USER,
+export const partner = atom({
+  key: "parners",
+  default: undefined,
+});
+
+export const UserInfoAtom = atom({
+  key: "UserInfoAtom",
   default: [],
+  effects_UNSTABLE: [
+    ({ onSet }) => {
+      onSet((data) => {
+        localStorage.setItem("medicine-user-info", JSON.stringify(data));
+      });
+    },
+  ],
 });

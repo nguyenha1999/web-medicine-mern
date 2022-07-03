@@ -7,12 +7,12 @@ import { Button, Col, Input, notification, Row, Table } from "antd";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
-import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useCallback, useEffect, useState } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { create, get, remove, update } from "../../api/import";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
-import { bill } from "../../recoils/Atoms";
+import { ImportAtom, UserInfoAtom } from "../../recoils/Atoms";
 import ImportDetail from "./ImportDetail";
 import style from "./style";
 
@@ -21,33 +21,39 @@ const DATE_FORMAT = "DD/MM/YYYY";
 const FULL_DATE_FORMAT = "DD/MM/YYYY HH:mm";
 
 const Import = () => {
-  const [data, setData] = useRecoilState(bill);
+  const [data, setData] = useRecoilState(ImportAtom);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const userInfo = useRecoilValue(UserInfoAtom);
+  const { code, username } = userInfo;
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
-    total: 200,
+    // total: 200,
   });
 
   const [removeId, setRemoveId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
 
-  const getData = useCallback(async (page) => {
-    setLoading(true);
+  const getData = useCallback(
+    async (page) => {
+      setLoading(true);
 
-    // get data
-    const { current, pageSize } = pagination;
+      // get data
+      const { current, pageSize } = pagination;
 
-    const res = await get(page || current, pageSize, search);
-    console.log(res);
-    setData(res?.data || []);
-    // setPagination({
-    //   ...pagination,
-    //   total: res?.data?.total || 0,
-    // });
-    setLoading(false);
-  }, []);
+      const res = await get(page || current, pageSize, search);
+      setData(res?.data);
+      console.log(res?.data);
+
+      // setPagination({
+      //   ...pagination,
+      //   total: res?.data?.total || 0,
+      // });
+      setLoading(false);
+    },
+    [pagination, search, setData]
+  );
 
   const updateData = useCallback(
     async (values) => {
@@ -56,7 +62,6 @@ const Import = () => {
       const next = isEdit ? update : create;
 
       try {
-        console.log(values);
         await next(values);
         setEditingItem(null);
         notification.success({
@@ -94,7 +99,7 @@ const Import = () => {
     const PADDING = 10;
     const LINE_HEIGHT = 8;
 
-    const { isExport, createdAt, staff, products } = record;
+    const { isExport, createdAt, products } = record;
 
     const doc = new jsPDF({
       orientation: "portrait",
@@ -106,8 +111,8 @@ const Import = () => {
 
     const timeType = isExport ? "Export Time" : "Import Time";
     const time = `${timeType}: ${moment(createdAt).format(FULL_DATE_FORMAT)}`;
-    const staffId = `StaffID: ${staff?._id}`;
-    const staffName = `StaffName: ${staff?.name}`;
+    const staffId = `StaffID: ${code}`;
+    const staffName = `StaffName: ${username}`;
     const sumValue = `SumValue: ${sum}`;
 
     let currentY = PADDING;
@@ -156,8 +161,8 @@ const Import = () => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "code",
+      key: "code",
       width: "5%",
     },
     {
@@ -171,31 +176,40 @@ const Import = () => {
       key: "products",
       width: "30%",
       render: (_text, record) => {
-        Array.isArray(record.products) &&
+        console.log(record);
+        return (
+          Array.isArray(record.products) &&
           record.products.length > 0 &&
           record.products.map((product) => (
             <div>
               {product.name}: {product.count}
             </div>
-          ));
+          ))
+        );
       },
     },
     {
       title: "Tổng tiền",
-      key: "price",
+      key: "prices",
       width: "15%",
       render: (_text, record) => {
-        Array.isArray(record.products) &&
+        console.log(record);
+        return (
+          Array.isArray(record.products) &&
           record.products.length > 0 &&
           record.products
             .map((product) => product.count * product.price)
-            .reduce((curr, pre) => curr + pre);
+            .reduce((curr, pre) => curr + pre)
+        );
       },
     },
     {
       title: "Nhân viên",
-      key: "staff",
-      render: (_text, record) => record.staff?.name,
+      key: "staffs",
+      dataIndex: "staffs",
+      render: (_text, record) => {
+        return record.staffs[0].username;
+      },
       width: "15%",
     },
     {

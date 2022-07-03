@@ -1,8 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Button, Card, Checkbox, Col, Form, Input, message, Row } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
 import { login } from "../../api/user";
+import { UserInfoAtom } from "../../recoils/Atoms";
 import "./index.scss";
 
 const Login = () => {
@@ -12,6 +14,8 @@ const Login = () => {
   });
   const history = useHistory();
 
+  const setUserInfo = useSetRecoilState(UserInfoAtom);
+
   const handlerInputChange = (event) => {
     const username = event.target.name;
     const value = event.target.value;
@@ -19,15 +23,20 @@ const Login = () => {
   };
 
   const submit = async (valueForm) => {
-    const datas = { ...valueForm };
-    const res = await login(datas);
-    const { data } = res;
-
-    if (data?.user) {
-      history.push("/");
-      message.success(`chào mừng bạn ${data?.user?.username}`);
-    } else {
-      message.error("Có lỗi xảy ra ...");
+    try {
+      const datas = { ...valueForm };
+      const res = await login(datas);
+      const { data } = res;
+      const { role } = data?.user;
+      if (data?.user) {
+        history.push("/");
+        // delete data?.user?.password;
+        setUserInfo(data?.user);
+        localStorage.setItem("vnd-medicine-role", role);
+        message.success(`chào mừng bạn ${data?.user?.username}`);
+      }
+    } catch (error) {
+      message.error("Looxi");
     }
   };
 
@@ -130,9 +139,6 @@ const Login = () => {
                   >
                     <Checkbox checked>Nhớ tài khoản</Checkbox>
                   </Form.Item>
-                  <a href="/register" style={{ marginTop: "4px" }}>
-                    Bạn chưa có tài khoản?, đăng kí ngay!
-                  </a>
                 </div>
 
                 <Button

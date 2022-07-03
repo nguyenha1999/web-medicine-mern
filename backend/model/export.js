@@ -1,13 +1,27 @@
 const mongoose = require("mongoose");
 
-const ImportSchema = new mongoose.Schema({
+const ExportSchema = new mongoose.Schema({
   name: String,
-  //   isExport: Boolean,
+  isExport: Boolean,
   nameCompany: String,
-  staff: String,
+  staffs: [
+    {
+      username: String,
+      code: String,
+      staff: { type: mongoose.SchemaTypes.ObjectId, ref: "Users" },
+    },
+  ],
   isDeleted: Boolean,
-  product: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Chemistries" }],
+  code: String,
+  products: [
+    {
+      name: String,
+      count: Number,
+      price: Number,
+      product: { type: mongoose.SchemaTypes.ObjectId, ref: "Chemistries" },
+    },
+  ],
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("imports", ImportSchema);
+module.exports = mongoose.model("exports", ExportSchema);

@@ -1,22 +1,24 @@
 const Imports = require("../../model/import");
 
-console.log(Imports);
 module.exports = {
   index: function () {
-    return Imports.find({});
+    return Imports.find({ isDeleted: false });
   },
-  post_index: function (isExport, createdAt, product, staff) {
-    console.log(isExport);
+
+  post_index: function (isExport, createdAt, products, staff) {
     return Imports.create({
       isExport: isExport,
       createdAt: createdAt,
-      product: product,
+      products: products,
       isDeleted: false,
-      staff: staff,
+      staffs: staff,
+      code: `IPB_${new Date().getMilliseconds()}`,
     });
   },
+
   put_index: function () {},
-  put_location: function (_id, isDeleted) {
-    return Imports.findByIdAndUpdate(_id, { isDeleted });
+
+  delete_index: function (id) {
+    return Imports.findByIdAndUpdate(id, { isDeleted: true });
   },
 };

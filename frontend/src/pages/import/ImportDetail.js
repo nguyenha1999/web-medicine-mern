@@ -1,7 +1,9 @@
 import { Col, DatePicker, Form, Input, Modal, notification, Row } from "antd";
 import moment from "moment";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { getSelectors } from "../../api/chemistry";
+import { UserInfoAtom } from "../../recoils/Atoms";
 import ChemistrySelector from "./ChemistrySelector";
 import TypeSelector from "./TypeSelector";
 
@@ -10,6 +12,8 @@ const DATE_FORMAT = "DD/MM/YYYY";
 const ImportDetail = ({ item, onOk, onCancel }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
+  const userInfo = useRecoilValue(UserInfoAtom);
+  const { username, code } = userInfo;
 
   const [chemistryOptions, setChemistryOptions] = useState([]);
   const getChemistrySelector = useCallback(async () => {
@@ -54,6 +58,7 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
   }, [item]);
 
   const onChangeSelector = (values) => {
+    // if (Array.isArray(data) && data?.products.length > 0) {
     const currentIds = data.products.map((product) => product._id);
     const newIds = values.filter((id) => !currentIds.includes(id));
 
@@ -63,6 +68,7 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
         _id: product._id,
         name: product.name,
         count: 1,
+        price: product.price,
       }));
 
     setData({
@@ -103,7 +109,7 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
 
   useEffect(() => {
     getChemistrySelector();
-  }, []);
+  }, [getChemistrySelector]);
 
   const onFinish = useCallback(async () => {
     setConfirmLoading(true);
@@ -122,24 +128,28 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
 
       const result = {
         ...data,
-        products: data.products.map((product) => ({
-          _id: product._id,
-          count: product.count,
-          name: product.name,
-        })),
+        staff: { username: username, code: code },
+        products: data?.products?.map((product) => {
+          return {
+            _id: product._id,
+            count: product.count,
+            name: product.name,
+            price: product.price,
+          };
+        }),
       };
+
+      console.log(result);
 
       await onOk(result);
     } catch (err) {
       notification.error({ message: err.message });
     }
     setConfirmLoading(false);
-  }, [item, onOk, data]);
+  }, [code, data, onOk, username]);
 
   const isEdit = !!item?._id;
   const title = isEdit ? "Sửa Hoá Đơn" : "Thêm Hoá Đơn";
-
-  console.log(data.products);
 
   return (
     <Modal
@@ -167,7 +177,7 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
             />
           </Form.Item>
         )}
-        {data.staff && <h5>Nhân viên: {data?.staff?.name || "Unknown"}</h5>}
+        {data.staff && <h5>Nhân viên: {data?.staff?.name || "Unknow"}</h5>}
         <Form.Item>
           <h5>{data.isExport ? "Thời gian xuất" : "Thời gian nhập"}</h5>
           <DatePicker
@@ -180,29 +190,35 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
           <h5>Lựa chọn Hoá Chất</h5>
           <ChemistrySelector
             options={chemistryOptions}
-            value={data.products.map((product) => product._id)}
+            value={
+              Array.isArray(data?.products) &&
+              data?.products?.length > 0 &&
+              data?.products?.map((product) => product._id)
+            }
             onChange={onChangeSelector}
           />
         </Form.Item>
-        {data.products.map((product) => (
-          <Form.Item key={product._id}>
-            <Row gutter={8} style={{ width: "420px" }}>
-              <Col span={12}>
-                <span>{product.name}</span>
-              </Col>
-              <Col span={12}>
-                <Input
-                  type="number"
-                  placeholder="Số  lượng"
-                  value={product.count}
-                  onChange={(e) =>
-                    onUpdateCountProduct(product._id, Number(e.target.value))
-                  }
-                />
-              </Col>
-            </Row>
-          </Form.Item>
-        ))}
+        {Array.isArray(data?.products) &&
+          data?.products?.length > 0 &&
+          data.products.map((product) => (
+            <Form.Item key={product._id}>
+              <Row gutter={8} style={{ width: "420px" }}>
+                <Col span={12}>
+                  <span>{product.name}</span>
+                </Col>
+                <Col span={12}>
+                  <Input
+                    type="number"
+                    placeholder="Số  lượng"
+                    value={product.count}
+                    onChange={(e) =>
+                      onUpdateCountProduct(product._id, Number(e.target.value))
+                    }
+                  />
+                </Col>
+              </Row>
+            </Form.Item>
+          ))}
       </Form>
     </Modal>
   );

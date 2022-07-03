@@ -4,48 +4,62 @@ const crypto = require("crypto");
 
 module.exports = {
   get_index: function () {
-    return User.find({}, "-hashedPass -salt")
-      .populate({
-        path: "roles",
-        match: { activated: true },
-        select: "title description",
-      })
-      .lean();
+    // return User.find({}, "-hashedPass -salt")
+    //   .populate({
+    //     path: "roles",
+    //     match: { activated: true },
+    //     select: "title description",
+    //   })
+    //   .lean();
+    return Users.find({ activated: true });
   },
-  post_index: function (email, firstName, lastName, password) {
+  get_profile: function (email) {
+    return Users.find({ email: email });
+  },
+  put_profile: function (_id, password) {
+    return Users.findByIdAndUpdate(_id, { password });
+  },
+  post_index: function (email, username, password, branch, value, tel, role) {
     return Users.create({
       email: email,
-      username: `${firstName} ${lastName}`,
+      username: username,
       password: password,
+      branch: branch,
+      value: value,
+      tel: tel,
+      role: role,
     });
   },
-  put_index: function (user, reason, username) {
-    var salt = crypto.randomBytes(128).toString("base64");
-    var hashedPassword = crypto
-      .createHmac("sha256", salt)
-      .update(user.hashedPass)
-      .digest("hex");
-    user.salt = salt;
-    user.hashedPass = hashedPassword;
+  // put_index: function (user, reason, username) {
+  //   var salt = crypto.randomBytes(128).toString("base64");
+  //   var hashedPassword = crypto
+  //     .createHmac("sha256", salt)
+  //     .update(user.hashedPass)
+  //     .digest("hex");
+  //   user.salt = salt;
+  //   user.hashedPass = hashedPassword;
 
-    return User(user)
-      .save()
-      .then((u) => {
-        user._id = u._id;
-        user.createdOn = u.createdOn;
-        user.activated = u.activated;
+  //   return User(user)
+  //     .save()
+  //     .then((u) => {
+  //       user._id = u._id;
+  //       user.createdOn = u.createdOn;
+  //       user.activated = u.activated;
 
-        return UserHistory({
-          roleId: u._id,
-          type: "Created",
-          reason: reason,
-          username: username,
-        }).save();
-      })
-      .then((log) => {
-        return user;
-      });
-  },
+  //       return UserHistory({
+  //         roleId: u._id,
+  //         type: "Created",
+  //         reason: reason,
+  //         username: username,
+  //       }).save();
+  //     })
+  //     .then((log) => {
+  //       return user;
+  //     });
+  // },
+put_index: function (){
+  
+}
   post_activate: function (userId, reason, activated, username) {
     return User.findById(userId)
       .then((user) => {
@@ -74,5 +88,8 @@ module.exports = {
       .then((log) => {
         return log.userId;
       });
+  },
+  delete_index: function (id) {
+    return Users.findByIdAndUpdate(id, { activated: false });
   },
 };

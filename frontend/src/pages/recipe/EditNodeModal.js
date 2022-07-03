@@ -1,5 +1,5 @@
 import { Button, Card, Col, Input, Modal, notification, Row } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import shortid from "shortid";
 import ChildrenTable from "./ChildrenTable";
 import style from "./style";
@@ -62,8 +62,6 @@ const EditNodeModal = ({ node, onOk, onOkRoot, onCancel, onRemove }) => {
   };
 
   const isRoot = node && !node.depth;
-
-  console.log(data);
 
   const onConfirm = async () => {
     setConfirmLoading(true);
@@ -137,7 +135,6 @@ const EditNodeModal = ({ node, onOk, onOkRoot, onCancel, onRemove }) => {
     if (!node) {
       setData(null);
     } else {
-      console.log(node);
       const newNode = {
         name: node?.data?.name,
         children: node?.data?.children,

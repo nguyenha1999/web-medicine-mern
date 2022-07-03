@@ -7,7 +7,7 @@ module.exports = {
   post_index: async function (email, password, _app_secretKey) {
     console.log("a", email);
     console.log(Users);
-    const user = await Users.findOne({ email: email });
+    const user = await Users.findOne({ email: email, password: password });
     // "-createdOn -activated"
     // ).populate({
     //   path: "roles",
@@ -30,6 +30,7 @@ module.exports = {
     );
     user.salt = undefined;
     user.hashedPass = undefined;
+    // user.password = "******";
     return { token, user };
   },
 };

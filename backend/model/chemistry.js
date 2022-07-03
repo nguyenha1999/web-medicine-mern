@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const ChemistrySchema = new mongoose.Schema({
   name: String,
   code: String,
-  sprice: Number,
+  price: Number,
   isDeleted: Boolean,
   use: String,
   nameCompany: String,
