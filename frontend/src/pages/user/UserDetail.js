@@ -1,40 +1,55 @@
 import { Form, Input, message, Modal } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BranchSelector from "./BranchSelector";
+import RoleSelector from "./RoleSelector";
 import ServiceSelector from "./ServiceSelector";
 
 const UserDetail = ({ item, onOk, onCancel }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
+  const [data, setData] = useState();
+
+  const reset = () =>
+    setData({
+      username: "",
+      branch: "",
+      value: "",
+      email: "",
+      tel: "",
+      code: "",
+      password: "",
+      role: "",
+    });
 
   useEffect(() => {
     if (!item) return;
 
     form.setFieldsValue({
-      emailUser: item.emailUser,
-      passwordUser: item.passwordUser,
-      nameUser: item.nameUser,
-      Id: item.Id,
-      vlue: item.vlue,
+      email: item.email,
+      password: item.password,
+      username: item.username,
+      code: item.code,
+      value: item.value,
       branch: item.branch,
     });
-  }, [item]);
+  }, [form, item]);
 
   const onFinish = useCallback(
     async (values) => {
       setConfirmLoading(true);
       try {
-        const data = { ...values };
+        setData(values);
         if (!!item?._id) {
           data._id = item._id;
         }
         await onOk(data);
+        reset();
       } catch (err) {
-        message.error({ message: err.message });
+        message.error("Cos lox xay ra");
       }
       setConfirmLoading(false);
     },
-    [item, onOk]
+    [data, item, onOk]
   );
 
   const isEdit = !!item?._id;
@@ -55,7 +70,7 @@ const UserDetail = ({ item, onOk, onCancel }) => {
       <Form form={form} name="control-hooks" onFinish={onFinish}>
         <Form.Item
           label="Tên Nhân Viên"
-          name="nameUser"
+          name="username"
           rules={[
             {
               required: true,
@@ -67,7 +82,7 @@ const UserDetail = ({ item, onOk, onCancel }) => {
         </Form.Item>
         <Form.Item
           label="Mã Nhân Viên"
-          name="Id"
+          name="code"
           rules={[
             {
               required: true,
@@ -79,7 +94,7 @@ const UserDetail = ({ item, onOk, onCancel }) => {
         </Form.Item>
         <Form.Item
           label="Email"
-          name="emailUser"
+          name="email"
           rules={[
             {
               required: true,
@@ -95,7 +110,7 @@ const UserDetail = ({ item, onOk, onCancel }) => {
         </Form.Item>
         <Form.Item
           label="Mật khẩu"
-          name="passwordUser"
+          name="password"
           rules={[
             {
               required: true,
@@ -114,7 +129,7 @@ const UserDetail = ({ item, onOk, onCancel }) => {
         </Form.Item>
         <Form.Item
           label="Chức Vụ"
-          name="vlue"
+          name="value"
           rules={[
             {
               required: true,
@@ -122,7 +137,6 @@ const UserDetail = ({ item, onOk, onCancel }) => {
             },
           ]}
         >
-          {/* <Input style={{ width: "360px", marginLeft: "35px" }} /> */}
           <ServiceSelector />
         </Form.Item>
         <Form.Item
@@ -135,8 +149,19 @@ const UserDetail = ({ item, onOk, onCancel }) => {
             },
           ]}
         >
-          {/* <Input style={{ width: "360px", marginLeft: "35px" }} /> */}
           <BranchSelector />
+        </Form.Item>
+        <Form.Item
+          label="Quyền trên hệ thống"
+          name="role"
+          rules={[
+            {
+              required: true,
+              message: "Vui lòng nhập tên bộ phận làm việc!!",
+            },
+          ]}
+        >
+          <RoleSelector />
         </Form.Item>
       </Form>
     </Modal>

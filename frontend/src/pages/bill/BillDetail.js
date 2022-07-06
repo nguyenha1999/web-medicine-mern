@@ -1,6 +1,6 @@
 import { Col, DatePicker, Form, Input, Modal, notification, Row } from "antd";
 import moment from "moment";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getSelectors } from "../../api/chemistry";
 import ChemistrySelector from "./ChemistrySelector";
 import TypeSelector from "./TypeSelector";
@@ -138,8 +138,6 @@ const BillDetail = ({ item, onOk, onCancel }) => {
 
   const isEdit = !!item?._id;
   const title = isEdit ? "Edit bill" : "Create bill";
-
-  console.log(data.staff);
 
   return (
     <Modal

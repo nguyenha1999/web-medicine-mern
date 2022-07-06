@@ -1,6 +1,6 @@
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
 import { Button, notification } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { remove } from "../../api/recipe";
 import ConfirmModal from "../../component/ConfirmModal";
@@ -12,8 +12,6 @@ const Recipe = () => {
   const history = useHistory();
   const { id } = useParams();
   const [visible, setVisible] = useState(false);
-
-  console.log(id);
 
   const onRemove = async () => {
     try {

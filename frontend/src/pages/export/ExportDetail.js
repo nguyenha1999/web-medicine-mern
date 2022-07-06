@@ -1,7 +1,9 @@
 import { Col, DatePicker, Form, Input, Modal, notification, Row } from "antd";
 import moment from "moment";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { getSelectors } from "../../api/chemistry";
+import { UserInfoAtom } from "../../recoils/Atoms";
 import ChemistrySelector from "./ChemistrySelector";
 import TypeSelector from "./TypeSelector";
 
@@ -10,6 +12,8 @@ const DATE_FORMAT = "DD/MM/YYYY";
 const ExportDetail = ({ item, onOk, onCancel }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
+  const userInfo = useRecoilValue(UserInfoAtom);
+  const { username, code } = userInfo;
 
   const [chemistryOptions, setChemistryOptions] = useState([]);
   const getChemistrySelector = useCallback(async () => {
@@ -63,6 +67,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
         _id: product._id,
         name: product.name,
         count: 1,
+        price: product.price,
       }));
 
     setData({
@@ -103,7 +108,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
 
   useEffect(() => {
     getChemistrySelector();
-  }, []);
+  }, [getChemistrySelector]);
 
   const onFinish = useCallback(async () => {
     setConfirmLoading(true);
@@ -122,10 +127,12 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
 
       const result = {
         ...data,
+        staff: { username: username, code: code },
         products: data.products.map((product) => ({
           _id: product._id,
           count: product.count,
           name: product.name,
+          price: product.price,
         })),
       };
 
@@ -138,8 +145,6 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
 
   const isEdit = !!item?._id;
   const title = isEdit ? "Sửa Hoá Đơn" : "Thêm Hoá Đơn";
-
-  console.log(data.products);
 
   return (
     <Modal

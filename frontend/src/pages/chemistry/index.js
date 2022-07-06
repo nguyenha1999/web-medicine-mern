@@ -1,9 +1,9 @@
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { CopyOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Col, Input, message, notification, Row, Table } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { create, get, remove, update } from "../../api/chemistry";
+import { clone, create, get, remove, update } from "../../api/chemistry";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
 import { chemistry } from "../../recoils/Atoms";
@@ -20,13 +20,13 @@ const Chemistry = () => {
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
-    total: 200,
+    pageSize: 5,
   });
 
   const [imageUrl, setImageUrl] = useState(null);
   const [removeId, setRemoveId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
+  const modalRef = useRef();
 
   const getData = useCallback(
     async (page) => {
@@ -36,15 +36,28 @@ const Chemistry = () => {
       const { current, pageSize } = pagination;
       const res = await get(page || current, pageSize, search);
       console.log(res);
-      setData(res?.data.items || []);
-      setPagination({
-        ...pagination,
-        total: res?.data?.total || 0,
-      });
+      setData(res?.data);
+      // setPagination({
+      //   ...pagination,
+      //   total: res?.data?.total || 0,
+      // });
 
       setLoading(false);
     },
-    [pagination, search]
+    [pagination, search, setData]
+  );
+
+  const handleClone = useCallback(
+    async (value) => {
+      try {
+        console.log(value);
+        await clone(value);
+        getData(1);
+      } catch (error) {
+        message.error("không clone đc");
+      }
+    },
+    [getData]
   );
 
   const updateData = useCallback(
@@ -74,7 +87,7 @@ const Chemistry = () => {
   const onRemove = useCallback(async () => {
     if (!removeId) return;
     try {
-      await remove(removeId);
+      await remove({ _id: removeId, isDeleted: true });
       setRemoveId(null);
       // notification.success({
       //   message: "Remove chemistry successfully",
@@ -86,32 +99,24 @@ const Chemistry = () => {
         message: err.message,
       });
     }
-  }, [removeId, getData]);
+  }, [getData, removeId]);
 
   const onTableChange = (pagination) => setPagination(pagination);
 
   useEffect(() => {
     getData();
-  }, [search, pagination.current, pagination.pageSize]);
-
-  console.log(data);
+  }, [search, pagination.pageSize, getData]);
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "_id",
-      key: "_id",
-      width: "5%",
+      title: "Mã hoá chất",
+      dataIndex: "code",
+      key: "code",
     },
     {
       title: "Tên hoá chất",
       dataIndex: "name",
       key: "name",
-    },
-    {
-      title: "Mã hoá chất",
-      dataIndex: "code",
-      key: "code",
     },
     {
       title: "Sử dụng",
@@ -164,10 +169,13 @@ const Chemistry = () => {
           <Row gutter={8}>
             <Col span="auto">
               <Button
-                type="primary"
+                style={{
+                  background: "#62a73b",
+                  color: "#fff",
+                }}
                 size="small"
-                icon={<EditOutlined />}
-                onClick={() => setEditingItem(record)}
+                icon={<CopyOutlined />}
+                onClick={() => handleClone(record)}
               >
                 Clone
               </Button>
@@ -177,7 +185,10 @@ const Chemistry = () => {
                 type="primary"
                 size="small"
                 icon={<EditOutlined />}
-                onClick={() => setEditingItem(record)}
+                onClick={() => {
+                  modalRef.current.show();
+                  setEditingItem(record);
+                }}
               >
                 Sửa
               </Button>
@@ -198,8 +209,6 @@ const Chemistry = () => {
     },
   ];
 
-  console.log(data);
-
   return (
     <Layout>
       <h2>Danh Sách Hoá Chất</h2>
@@ -213,14 +222,15 @@ const Chemistry = () => {
               borderRadius: "4px",
               color: "#fff",
             }}
-            onClick={() =>
+            onClick={() => {
+              modalRef.current.show();
               setEditingItem({
                 name: "",
                 use: "",
                 imageUrl: "",
                 price: "",
-              })
-            }
+              });
+            }}
           >
             THÊM HOÁ CHẤT
           </Button>
@@ -260,6 +270,7 @@ const Chemistry = () => {
         onCancel={() => setRemoveId(null)}
       />
       <ChemistryDetail
+        ref={modalRef}
         item={editingItem}
         onOk={updateData}
         onCancel={() => setEditingItem(null)}

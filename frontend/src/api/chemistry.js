@@ -1,13 +1,20 @@
-import { axiosClient } from "./axiosClient";
+import { axiosTest } from "./axiosClient";
 
 export const get = (page, limit, search) =>
-  axiosClient.get("/chemistries", { params: { page, limit, search } });
+  axiosTest.get("root/chemistry", { params: { page, limit, search } });
 
-export const create = (data) => axiosClient.post("/chemistries", data);
+export const create = (data) => axiosTest.post("root/chemistry", data);
 
-export const update = (data) =>
-  axiosClient.put(`/chemistries/${data._id}`, data);
+export const update = (data) => {
+  axiosTest.put(`root/chemistry`, data);
+};
 
-export const remove = (id) => axiosClient.delete(`/chemistries/${id}`);
+export const remove = (data) => {
+  axiosTest.delete(`root/chemistry/?id=${data._id}`);
+};
 
-export const getSelectors = () => axiosClient.get("/chemistries-dropdown");
+export const clone = (data) => {
+  axiosTest.post("root/chemistry/clone", data);
+};
+
+export const getSelectors = () => axiosTest.get("root/chemistry");

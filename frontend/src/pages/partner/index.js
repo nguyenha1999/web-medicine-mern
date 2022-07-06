@@ -1,25 +1,25 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Col, Input, notification, Row, Table } from "antd";
 import "jspdf-autotable";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { create, get, remove, update } from "../../api/bill";
+import { create, get, remove, update } from "../../api/partner";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
-import { bill } from "../../recoils/Atoms";
+import { partner } from "../../recoils/Atoms";
 import PartnerDetail from "./PartnerDetail";
 import style from "./style";
 
 const { Search } = Input;
 
 const Import = () => {
-  const [data, setData] = useRecoilState(bill);
+  const [data, setData] = useRecoilState(partner);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
-    total: 200,
+    // total: 200,
   });
 
   const [removeId, setRemoveId] = useState(null);
@@ -32,7 +32,7 @@ const Import = () => {
       // get data
       const { current, pageSize } = pagination;
       const res = await get(page || current, pageSize, search);
-      setData(res?.data?.items || []);
+      setData(res?.data || []);
       setPagination({
         ...pagination,
         total: res?.data?.total || 0,
@@ -40,7 +40,7 @@ const Import = () => {
 
       setLoading(false);
     },
-    [pagination, search]
+    [pagination, search, setData]
   );
 
   const updateData = useCallback(
@@ -90,8 +90,8 @@ const Import = () => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "code",
+      key: "code",
       width: "5%",
     },
     {
@@ -102,9 +102,9 @@ const Import = () => {
     },
     {
       title: "Địa chỉ",
-      key: "adress",
+      key: "address",
       width: "30%",
-      dataIndex: "adress",
+      dataIndex: "address",
     },
     {
       title: "Hotline",
@@ -116,7 +116,7 @@ const Import = () => {
       key: "products",
       render: (_text, record) => (
         <div>
-          {!!record.products?.length ? (
+          {Array.isArray(record.products) && record.products?.length > 0 ? (
             record.products.map((product) => (
               <div style={style.bold}>{product.name}</div>
             ))
@@ -199,7 +199,7 @@ const Import = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
-            rowClassName={(record) => !record.enabled && "disabled-row"}
+            // rowClassName={(record) => !record.enabled && "disabled-row"}
           />
         </Col>
       </Row>

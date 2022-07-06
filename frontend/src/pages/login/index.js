@@ -1,7 +1,10 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Button, Card, Checkbox, Col, Form, Input, message, Row } from "antd";
-import React, { useState } from "react";
-import Particles from "react-particles-js";
+import { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { login } from "../../api/user";
+import { UserInfoAtom } from "../../recoils/Atoms";
 import "./index.scss";
 
 const Login = () => {
@@ -11,29 +14,29 @@ const Login = () => {
   });
   const history = useHistory();
 
+  const setUserInfo = useSetRecoilState(UserInfoAtom);
+
   const handlerInputChange = (event) => {
-    const name = event.target.name;
+    const username = event.target.name;
     const value = event.target.value;
-    setUser({ ...user, [name]: value });
+    setUser({ ...user, [username]: value });
   };
 
-  console.log(user);
-
-  const submit = () => {
-    if (
-      user.email === "lengocha15999@gmail.com" &&
-      user.password === "1234567"
-    ) {
-      history.push("/");
-      message.success("Xin chào Lê Ngọc Hà");
-    } else if (
-      user.email === "admin@gmail.com" &&
-      user.password === "1234567"
-    ) {
-      history.push("/");
-      message.success("Bạn đã đăng nhập với quyền Admin");
-    } else {
-      message.error("Sai tên Email hoặc Mật Khẩu");
+  const submit = async (valueForm) => {
+    try {
+      const datas = { ...valueForm };
+      const res = await login(datas);
+      const { data } = res;
+      const { role } = data?.user;
+      if (data?.user) {
+        history.push("/");
+        // delete data?.user?.password;
+        setUserInfo(data?.user);
+        localStorage.setItem("vnd-medicine-role", role);
+        message.success(`chào mừng bạn ${data?.user?.username}`);
+      }
+    } catch (error) {
+      message.error("Looxi");
     }
   };
 
@@ -136,9 +139,6 @@ const Login = () => {
                   >
                     <Checkbox checked>Nhớ tài khoản</Checkbox>
                   </Form.Item>
-                  <a href="#" style={{ marginTop: "4px" }}>
-                    Quên mật khẩu ?
-                  </a>
                 </div>
 
                 <Button
@@ -152,120 +152,6 @@ const Login = () => {
             </Card>
           </Col>
         </Row>
-      </div>
-      <div className="bg-overlay">
-        <Particles
-          params={{
-            particles: {
-              number: {
-                value: 20,
-                density: {
-                  enable: true,
-                  value_area: 1000,
-                },
-              },
-              color: {
-                value: "#1e90ff",
-              },
-              shape: {
-                type: "circle",
-                stroke: {
-                  width: 0,
-                  color: "#000000",
-                },
-                polygon: {
-                  nb_sides: 5,
-                },
-                image: {
-                  src: "img/github.svg",
-                  width: 100,
-                  height: 100,
-                },
-              },
-              opacity: {
-                value: 0.5,
-                random: false,
-                anim: {
-                  enable: false,
-                  speed: 1,
-                  opacity_min: 0.1,
-                  sync: false,
-                },
-              },
-              size: {
-                value: 3,
-                random: true,
-                anim: {
-                  enable: false,
-                  speed: 40,
-                  size_min: 0.1,
-                  sync: false,
-                },
-              },
-              line_linked: {
-                enable: true,
-                distance: 150,
-                color: "#1e90ff",
-                opacity: 1,
-                width: 2,
-              },
-              move: {
-                enable: true,
-                speed: 6,
-                direction: "none",
-                random: false,
-                straight: false,
-                out_mode: "out",
-                bounce: false,
-                attract: {
-                  enable: false,
-                  rotateX: 600,
-                  rotateY: 1200,
-                },
-              },
-            },
-            interactivity: {
-              detect_on: "canvas",
-              events: {
-                onhover: {
-                  enable: true,
-                  mode: "repulse",
-                },
-                onclick: {
-                  enable: true,
-                  mode: "push",
-                },
-                resize: true,
-              },
-              modes: {
-                grab: {
-                  distance: 400,
-                  line_linked: {
-                    opacity: 1,
-                  },
-                },
-                bubble: {
-                  distance: 400,
-                  size: 40,
-                  duration: 2,
-                  opacity: 8,
-                  speed: 3,
-                },
-                repulse: {
-                  distance: 200,
-                  duration: 0.4,
-                },
-                push: {
-                  particles_nb: 4,
-                },
-                remove: {
-                  particles_nb: 2,
-                },
-              },
-            },
-            retina_detect: true,
-          }}
-        />
       </div>
     </div>
   );

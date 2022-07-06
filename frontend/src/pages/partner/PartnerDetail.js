@@ -1,5 +1,5 @@
 import { Form, Input, Modal, notification } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getSelectors } from "../../api/chemistry";
 import ChemistrySelector from "./ChemistrySelector";
 
@@ -24,7 +24,6 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
     adress: "",
     hotline: "",
     products: [],
-    isExport: false,
   });
 
   const reset = () =>
@@ -33,7 +32,6 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
       adress: "",
       hotline: "",
       products: [],
-      isExport: false,
     });
 
   useEffect(() => {
@@ -53,8 +51,6 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
 
     setData(itemData);
   }, [item]);
-
-  console.log(item);
 
   const onChangeSelector = (values) => {
     const currentIds = data.products.map((product) => product._id);
@@ -87,8 +83,6 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
     getChemistrySelector();
   }, []);
 
-  console.log(data);
-
   const onFinish = useCallback(
     async (vlue) => {
       setConfirmLoading(true);
@@ -111,6 +105,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
         };
 
         await onOk(result);
+        reset();
       } catch (err) {
         notification.error({ message: err.message });
       }
@@ -120,19 +115,14 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
   );
 
   const isEdit = !!item?._id;
-  const title = isEdit ? "Sửa Hoá Đơn" : "Thêm Hoá Đơn";
-
-  console.log(data);
-  console.log(data.products);
+  const title = isEdit ? "Sửa Thông tin đối tác" : "Thêm đối tác";
 
   return (
     <Modal
       title={title}
       visible={!!item}
       onOk={() => {
-        {
-          form.submit();
-        }
+        form.submit();
       }}
       onCancel={() => {
         reset();
@@ -154,7 +144,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
           <Input value="1" name="nameCompany" onChange={handlerInputChange} />
         </Form.Item>
         <Form.Item
-          name="adress"
+          name="address"
           label="Địa Chỉ"
           rules={[
             {
@@ -165,7 +155,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
         >
           <Input
             style={{ marginLeft: "26px", width: "377px" }}
-            name="adress"
+            name="address"
             onChange={handlerInputChange}
           />
         </Form.Item>

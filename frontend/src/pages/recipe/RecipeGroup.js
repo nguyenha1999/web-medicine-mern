@@ -3,7 +3,7 @@ import { Group } from "@visx/group";
 import { hierarchy, Tree } from "@visx/hierarchy";
 import { LinkVertical } from "@visx/shape";
 import { notification } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { create, getById, update } from "../../api/recipe";
 import EditNodeModal from "./EditNodeModal";
@@ -40,8 +40,6 @@ const RecipeGroup = ({
     return parent.children.find((item) => item._id === childId);
   };
 
-  console.log(data);
-
   const getParentFromRoot = () => {
     const parentIds = pathIds.slice(0, pathIds.length - 1);
 
@@ -52,8 +50,6 @@ const RecipeGroup = ({
 
     return child;
   };
-
-  console.log(data);
 
   const getChildFromRoot = () => {
     let child = data;
@@ -71,15 +67,13 @@ const RecipeGroup = ({
       if (node.parent) {
         ids = [...ids, ...getNodeParentIds(node.parent)];
       }
-      console.log(ids);
+
       return ids;
     } catch (err) {
       console.error(err);
       return [];
     }
   };
-
-  console.log(getNodeParentIds());
 
   const pathIds = useMemo(() => {
     const ids = getNodeParentIds(editingNode);
@@ -138,7 +132,6 @@ const RecipeGroup = ({
       }
 
       removeNewChildrenId(data);
-      console.log(removeNewChildrenId(data));
 
       await update(data);
       await getData();
@@ -220,15 +213,12 @@ const RecipeGroup = ({
 
     // đóng mở nút con
     if (node.data.isExpanded) {
-      console.log("is closed --> open children");
       openChildren(node);
     } else {
       // mở nút cháu
       if (node.children.some((child) => child.data.isExpanded)) {
-        console.log("is open children --> open all children");
         openAllChildren(node);
       } else {
-        console.log("is open all children --> close");
         closeAllChildren(node);
       }
     }

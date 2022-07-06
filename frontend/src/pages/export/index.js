@@ -7,9 +7,9 @@ import { Button, Col, Input, message, notification, Row, Table } from "antd";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { create, get, remove, update } from "../../api/bill";
+import { create, get, remove, update } from "../../api/export";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
 import { bill } from "../../recoils/Atoms";
@@ -27,7 +27,6 @@ const Export = () => {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
-    total: 200,
   });
 
   const [removeId, setRemoveId] = useState(null);
@@ -40,15 +39,11 @@ const Export = () => {
       // get data
       const { current, pageSize } = pagination;
       const res = await get(page || current, pageSize, search);
-      setData(res?.data?.items || []);
-      setPagination({
-        ...pagination,
-        total: res?.data?.total || 0,
-      });
+      setData(res?.data || []);
 
       setLoading(false);
     },
-    [pagination, search]
+    [pagination, search, setData]
   );
 
   const updateData = useCallback(
@@ -150,13 +145,13 @@ const Export = () => {
 
   useEffect(() => {
     getData();
-  }, [search, pagination.current, pagination.pageSize]);
+  }, [getData]);
 
   const columns = [
     {
       title: "ID",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "code",
+      key: "code",
       width: "5%",
     },
     {
@@ -178,17 +173,19 @@ const Export = () => {
     },
     {
       title: "Tổng tiền",
-      key: "price",
+      key: "prices",
       width: "15%",
       render: (_text, record) =>
+        Array.isArray(record?.products) &&
+        record?.products.length > 0 &&
         record.products
           .map((product) => product.count * product.price)
           .reduce((curr, pre) => curr + pre),
     },
     {
       title: "Nhân viên",
-      key: "staff",
-      render: (_text, record) => record.staff?.name,
+      key: "staffs",
+      render: (_text, record) => record.staffs[0].username,
       width: "15%",
     },
     {
@@ -272,7 +269,7 @@ const Export = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
-            rowClassName={(record) => !record.enabled && "disabled-row"}
+            // rowClassName={(record) => !record.enabled && "disabled-row"}
             // expandable={{
             //   expandedRowRender: (record) => (
             //     <div>

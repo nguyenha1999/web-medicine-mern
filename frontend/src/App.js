@@ -1,6 +1,9 @@
-import React, { lazy } from "react";
+import { lazy, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import API from "./api/api";
 import "./App.css";
+import { UserInfoAtom } from "./recoils/Atoms";
 import Suspense from "./routes/Routers";
 
 const Recipe = lazy(() => import("./pages/recipe"));
@@ -11,10 +14,27 @@ const Export = lazy(() => import("./pages/export"));
 const Partner = lazy(() => import("./pages/partner"));
 const Login = lazy(() => import("./pages/login"));
 const Profile = lazy(() => import("./pages/profile"));
-const Register = lazy(() => import("./pages/register"));
 const User = lazy(() => import("./pages/user"));
+const Home = lazy(() => import("./pages/home"));
 
 function App() {
+  const setUser = useSetRecoilState(UserInfoAtom);
+  useEffect(() => {
+    let token = sessionStorage.getItem("token");
+    if (typeof token === "string") {
+      token = JSON.parse(token);
+      API.setAccessToken = token;
+    }
+  });
+
+  useEffect(() => {
+    let userInfo = localStorage.getItem("vnd-medicine-info");
+    if (typeof userInfo === "string") {
+      userInfo = JSON.parse(userInfo);
+      setUser(userInfo);
+    }
+  }, [setUser]);
+
   return (
     <Router>
       <Switch>
@@ -25,10 +45,10 @@ function App() {
           <Suspense component={<Recipe />} />
         </Route>
         <Route exact path="/">
-          <Suspense component={<Chemistry />} />
+          <Suspense component={<Home />} />
         </Route>
-        <Route exact path="/register">
-          <Suspense component={<Register />} />
+        <Route exact path="/chemistries">
+          <Suspense component={<Chemistry />} />
         </Route>
         <Route exact path="/profile">
           <Suspense component={<Profile />} />
