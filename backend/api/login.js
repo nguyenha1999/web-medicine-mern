@@ -5,8 +5,6 @@ const Users = require("../model/user");
 
 module.exports = {
   post_index: async function (email, password, _app_secretKey) {
-    console.log("a", email);
-    console.log(Users);
     const user = await Users.findOne({ email: email, password: password });
     // "-createdOn -activated"
     // ).populate({
@@ -19,7 +17,6 @@ module.exports = {
     //   match: { activated: true },
     //   select: "-_id title frontends",
     // });
-    console.log(user);
     if (!user) throw new ServerError("Bad Request", 400);
     // if (!user.authenticate(password))
     //   throw new ServerError("Unauthenticated", 401);

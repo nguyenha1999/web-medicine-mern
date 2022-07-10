@@ -2,16 +2,16 @@ const style = {
   modalContainer: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   image: {
-    maxWidth: "100%"
+    maxWidth: "100%",
   },
   mb2: {
-    marginBottom: "8px"
+    marginBottom: "8px",
   },
   hiddenInput: {
-    display: "none"
+    display: "none",
   },
   labelInput: {
     padding: "4px",
@@ -21,8 +21,12 @@ const style = {
     color: "#fff",
     fontWeight: 500,
     fontSize: "0.9em",
-    cursor: "pointer"
-  }
-}
+    cursor: "pointer",
+  },
+  tableHidden: {
+    border: "1px solid red",
+    backgroundColor: "#000",
+  },
+};
 
-export default style
+export default style;

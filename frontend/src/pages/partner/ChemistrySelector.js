@@ -1,9 +1,10 @@
 import { Select } from "antd";
-import React from "react";
 
 const { Option } = Select;
 
 const ChemistrySelector = ({ options, value, onChange }) => {
+  console.log(options);
+  console.log(value);
   return (
     <Select
       mode="multiple"

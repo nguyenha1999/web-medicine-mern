@@ -3,7 +3,9 @@ import { Avatar, Col, Dropdown, Layout, Menu, Row } from "antd";
 import PropTypes from "prop-types";
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import logo from "../img/logo.png";
+import { UserInfoAtom } from "../recoils/Atoms";
 import "./layout.css";
 
 const { Header } = Layout;
@@ -11,21 +13,18 @@ const { Header } = Layout;
 const HeaderComponent = (props) => {
   const { click } = props;
   const history = useHistory();
-  const roleUser = localStorage.getItem("role");
-  const nameUser = localStorage.getItem("name");
-  const goBack = () => {
-    localStorage.clear();
-    history.push("/login");
-  };
+  const userInfo = useRecoilValue(UserInfoAtom);
+  const { role } = userInfo;
+
   const login = () => {
     history.push("/login");
   };
   const menu = (
     <Menu style={{ width: 220 }}>
-      <Menu.Item key="0">
+      <Menu.Item key="0" hidden={role === "admin"}>
         <Link to="/profile">Hồ sơ</Link>
       </Menu.Item>
-      <Menu.Divider />
+      <Menu.Divider hidden={role === "admin"} />
       <Menu.Item key="3" onClick={login}>
         Đăng xuất
       </Menu.Item>

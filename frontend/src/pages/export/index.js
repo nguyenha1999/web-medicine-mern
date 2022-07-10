@@ -1,4 +1,5 @@
 import {
+  CopyOutlined,
   DeleteOutlined,
   EditOutlined,
   FilePdfOutlined,
@@ -8,11 +9,11 @@ import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { create, get, remove, update } from "../../api/export";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
-import { bill } from "../../recoils/Atoms";
+import { exports, UserInfoAtom } from "../../recoils/Atoms";
 import ExportDetail from "./ExportDetail";
 import style from "./style";
 
@@ -21,8 +22,11 @@ const DATE_FORMAT = "DD/MM/YYYY";
 const FULL_DATE_FORMAT = "DD/MM/YYYY HH:mm";
 
 const Export = () => {
-  const [data, setData] = useRecoilState(bill);
+  const [data, setData] = useRecoilState(exports);
   const [loading, setLoading] = useState(false);
+  const userInfo = useRecoilValue(UserInfoAtom);
+  const { role } = userInfo;
+
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
@@ -38,12 +42,12 @@ const Export = () => {
 
       // get data
       const { current, pageSize } = pagination;
-      const res = await get(page || current, pageSize, search);
+      const res = await get(page, role || current, pageSize, search);
       setData(res?.data || []);
 
       setLoading(false);
     },
-    [pagination, search, setData]
+    [pagination, role, search, setData]
   );
 
   const updateData = useCallback(
@@ -71,7 +75,7 @@ const Export = () => {
   const onRemove = useCallback(async () => {
     if (!removeId) return;
     try {
-      await remove(removeId);
+      await remove(removeId, role);
       setRemoveId(null);
       message.success("Xoá đơn nhập thành công");
       getData(1);
@@ -80,7 +84,7 @@ const Export = () => {
         message: err.message,
       });
     }
-  }, [removeId, getData]);
+  }, [removeId, role, getData]);
 
   const onTableChange = (pagination) => setPagination(pagination);
 
@@ -163,7 +167,7 @@ const Export = () => {
     {
       title: "Sản phẩm",
       key: "products",
-      width: "30%",
+      width: "20%",
       render: (_text, record) =>
         record.products.map((product) => (
           <div>
@@ -191,7 +195,7 @@ const Export = () => {
     {
       title: "Hành động",
       key: "action",
-      width: "25%",
+      width: "35%",
       render: (_text, record) => {
         return (
           <Row gutter={8}>
@@ -199,6 +203,9 @@ const Export = () => {
               <Button
                 type="warning"
                 size="small"
+                style={{
+                  borderRadius: "4px",
+                }}
                 icon={<FilePdfOutlined />}
                 onClick={() => print(record)}
               >
@@ -207,7 +214,24 @@ const Export = () => {
             </Col>
             <Col span="auto">
               <Button
-                type="primary"
+                style={{
+                  background: "#62a73b",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
+                size="small"
+                icon={<CopyOutlined />}
+              >
+                History
+              </Button>
+            </Col>
+            <Col span="auto">
+              <Button
+                style={{
+                  backgroundColor: "#f56a00",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
                 size="small"
                 icon={<EditOutlined />}
                 onClick={() => setEditingItem(record)}
@@ -218,6 +242,9 @@ const Export = () => {
             <Col span="auto">
               <Button
                 type="danger"
+                style={{
+                  borderRadius: "4px",
+                }}
                 size="small"
                 icon={<DeleteOutlined />}
                 onClick={() => setRemoveId(record._id)}
@@ -235,24 +262,31 @@ const Export = () => {
     <Layout>
       <h2>Danh Sách Đơn Xuất Kho</h2>
       <Row style={style.mb2}>
-        <Col span={4}>
+        <Col span={5}>
           <Button
             color="success"
-            onClick={() =>
+            style={{
+              background: "#319795",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              color: "#fff",
+            }}
+            onClick={() => {
               setEditingItem({
                 createdAt: new Date().getTime(),
                 isExport: false,
                 products: [],
-              })
-            }
+              });
+            }}
           >
-            Thêm Hoá Đơn Xuất Kho
+            THÊM HOÁ ĐƠN XUẤT
           </Button>
         </Col>
-        <Col span={12}>
+        <Col span={12} style={style.mb2}>
           <Search
-            placeholder="Search"
+            placeholder="Tìm kiếm"
             onSearch={(value) => setSearch(value)}
+            onChange={(e) => getData(1, role, e.target.value)}
             enterButton
           />
         </Col>
@@ -269,23 +303,7 @@ const Export = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
-            // rowClassName={(record) => !record.enabled && "disabled-row"}
-            // expandable={{
-            //   expandedRowRender: (record) => (
-            //     <div>
-            //       <h5>PRODUCT LIST</h5>
-            //       {!!record.products?.length ? (
-            //         record.products.map((product) => (
-            //           <div style={style.bold}>
-            //             {product.name}: {product.count}
-            //           </div>
-            //         ))
-            //       ) : (
-            //         <span>No products.</span>
-            //       )}
-            //     </div>
-            //   ),
-            // }}
+            rowClassName={(record) => record.isDeleted && "table-hidden"}
           />
         </Col>
       </Row>

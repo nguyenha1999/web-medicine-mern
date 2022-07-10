@@ -1,12 +1,13 @@
-import { axiosTest } from "./axiosClient";
+import { axiosClient } from "./axiosClient";
 
-export const get = (page, limit, search, isDescending) =>
-  axiosTest.get("root/partner", {
-    params: { page, limit, search, isDescending },
+export const get = (page, role, limit, search, isDescending) =>
+  axiosClient.get("root/partner", {
+    params: { page, role, limit, search, isDescending },
   });
 
-export const create = (data) => axiosTest.post("root/partner", data);
+export const create = (data) => axiosClient.post("root/partner", data);
 
-export const update = (data) => axiosTest.put(`root/partner`, data);
+export const update = (data) => axiosClient.put(`root/partner`, data);
 
-export const remove = (id) => axiosTest.delete(`root/partner/?id=${id}`);
+export const remove = (id, role) =>
+  axiosClient.delete(`root/partner/?id=${id}&role=${role}`);

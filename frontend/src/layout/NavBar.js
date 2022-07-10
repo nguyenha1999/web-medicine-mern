@@ -1,20 +1,25 @@
-import {
-  FileAddOutlined,
-  FilePdfOutlined,
-  HomeOutlined,
-  TeamOutlined,
-  UserOutlined,
-  UserSwitchOutlined,
-} from "@ant-design/icons";
+// import {
+//   FileAddOutlined,
+//   FilePdfOutlined,
+//   HomeOutlined,
+//   TeamOutlined,
+//   UserOutlined,
+//   UserSwitchOutlined,
+// } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { UserInfoAtom } from "../recoils/Atoms";
+import { getRoutes } from "../routes/route-setup";
 
 const NavBar = (props) => {
-  const { SubMenu } = Menu;
   const { collapsed } = props;
   const { Sider } = Layout;
   const { pathname } = useLocation();
+  const userInfo = useRecoilValue(UserInfoAtom);
+
+  const routes = getRoutes(userInfo?.role);
 
   return (
     <Sider
@@ -31,12 +36,20 @@ const NavBar = (props) => {
       <Menu
         theme="light"
         defaultSelectedKeys={pathname}
+        defaultOpenKeys="import"
         mode="inline"
         style={{
           borderRadius: "8px",
         }}
       >
-        <Menu.Item key="/1" icon={<HomeOutlined />}>
+        {routes?.map((e) => {
+          return (
+            <Menu.Item key={e.to} icon={e.icon}>
+              <NavLink to={e.to}>{e.title}</NavLink>
+            </Menu.Item>
+          );
+        })}
+        {/* <Menu.Item key="/" icon={<HomeOutlined />}>
           <NavLink to="/">Trang Chủ</NavLink>
         </Menu.Item>
         <Menu.Item key="/bill" icon={<FilePdfOutlined />}>
@@ -45,14 +58,12 @@ const NavBar = (props) => {
         <Menu.Item key="/2" icon={<FilePdfOutlined />}>
           <NavLink to="/chemistries">Sản Phẩm</NavLink>
         </Menu.Item>
-        <SubMenu key="tesst" title="Hoá Đơn">
-          <Menu.Item key="/import" icon={<FileAddOutlined />}>
-            <NavLink to="/import">Đơn Nhập</NavLink>
-          </Menu.Item>
-          <Menu.Item key="/export" icon={<FilePdfOutlined />}>
-            <NavLink to="/export">Đơn Xuất</NavLink>
-          </Menu.Item>
-        </SubMenu>
+        <Menu.Item key="/import" icon={<FileAddOutlined />}>
+          <NavLink to="/import">Đơn Nhập</NavLink>
+        </Menu.Item>
+        <Menu.Item key="/export" icon={<FilePdfOutlined />}>
+          <NavLink to="/export">Đơn Xuất</NavLink>
+        </Menu.Item>
         <Menu.Item key="/partner" icon={<UserSwitchOutlined />}>
           <NavLink to="/partner">Đối Tác</NavLink>
         </Menu.Item>
@@ -61,7 +72,7 @@ const NavBar = (props) => {
         </Menu.Item>
         <Menu.Item key="/user" icon={<TeamOutlined />}>
           <NavLink to="/user">Nhân Viên</NavLink>
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu>
     </Sider>
   );

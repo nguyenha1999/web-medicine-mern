@@ -5,6 +5,7 @@ const ChemistrySchema = new mongoose.Schema({
   code: String,
   price: Number,
   isDeleted: Boolean,
+  count: Number,
   use: String,
   nameCompany: String,
   staff: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Users" }],

@@ -1,23 +1,32 @@
 const ServerError = require("../../utils/serverError");
 const Chemistries = require("../../model/chemistry");
+const Recipe = require("../../model/recipe");
 
 module.exports = {
-  index: function (page, limit) {
+  index: function (role) {
+    if (role === "admin") {
+      return Chemistries.find();
+    }
+
     return Chemistries.find({ isDeleted: false });
   },
 
   post_index: function (name, code, use, price) {
-    // const isExit = await Chemistries.exists({ name: name, code: code });
-
-    // if (isExit) {
-    //   return new ServerError(400, "Hoá chất đã tồn tại");
-    // }
+    Recipe.create({
+      name: name,
+      code: code,
+      ratio: 100,
+      childrenId: "",
+      parendId: "",
+      depth: 0,
+    });
 
     return Chemistries.create({
       name: name,
       code: code,
       use: use,
       price: price,
+      count: 1,
       isDeleted: false,
     });
   },
@@ -41,7 +50,6 @@ module.exports = {
     const newName = `[Clone]_${name}`;
     const newCode = `[Clone]_${code}`;
 
-    console.log(numberOfProcedure);
     return Chemistries.create({
       name: newName,
       code: newCode,
@@ -58,7 +66,10 @@ module.exports = {
       price,
     });
   },
-  delete_index: function (id) {
+  delete_index: function (id, role) {
+    if (role === "admin") {
+      return Chemistries.findByIdAndDelete(id);
+    }
     return Chemistries.findByIdAndUpdate(id, { isDeleted: true });
   },
 };

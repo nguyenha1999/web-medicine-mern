@@ -25,6 +25,11 @@ export const partner = atom({
   default: undefined,
 });
 
+export const RecipeAtom = atom({
+  key: "RecipeAtom",
+  default: [],
+});
+
 export const UserInfoAtom = atom({
   key: "UserInfoAtom",
   default: [],

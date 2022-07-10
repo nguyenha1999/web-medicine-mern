@@ -141,7 +141,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
       notification.error({ message: err.message });
     }
     setConfirmLoading(false);
-  }, [item, onOk, data]);
+  }, [data, username, code, onOk]);
 
   const isEdit = !!item?._id;
   const title = isEdit ? "Sửa Hoá Đơn" : "Thêm Hoá Đơn";

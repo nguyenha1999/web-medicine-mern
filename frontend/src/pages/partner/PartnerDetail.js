@@ -6,6 +6,7 @@ import ChemistrySelector from "./ChemistrySelector";
 const ExportDetail = ({ item, onOk, onCancel }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
+  console.log(item);
 
   const [chemistryOptions, setChemistryOptions] = useState([]);
   const getChemistrySelector = useCallback(async () => {
@@ -19,12 +20,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
     }
   }, []);
 
-  const [data, setData] = useState({
-    nameCompany: "",
-    adress: "",
-    hotline: "",
-    products: [],
-  });
+  const [data, setData] = useState();
 
   const reset = () =>
     setData({
@@ -37,20 +33,26 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
   useEffect(() => {
     if (!item) return;
 
+    console.log(item);
     const itemData = {
       nameCompany: item.nameCompany,
-      adress: item.adress,
+      adress: item.address,
       hotline: item.hotline,
       products: item.products,
-      isExport: item.isExport,
     };
 
     if (item._id) {
       itemData._id = item._id;
     }
 
+    form.setFieldsValue({
+      nameCompany: item.nameCompany,
+      address: item.address,
+      hotline: item.hotline,
+    });
+
     setData(itemData);
-  }, [item]);
+  }, [form, item]);
 
   const onChangeSelector = (values) => {
     const currentIds = data.products.map((product) => product._id);
@@ -81,49 +83,46 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
 
   useEffect(() => {
     getChemistrySelector();
-  }, []);
+  }, [getChemistrySelector]);
 
-  const onFinish = useCallback(
-    async (vlue) => {
-      setConfirmLoading(true);
-      try {
-        if (!data || !data.products) {
-          throw new Error("Invalid information");
-        }
-
-        if (!data.products.length) {
-          throw new Error("Product list is empty");
-        }
-
-        const result = {
-          ...data,
-          products: data.products.map((product) => ({
-            _id: product._id,
-            count: product.count,
-            name: product.name,
-          })),
-        };
-
-        await onOk(result);
-        reset();
-      } catch (err) {
-        notification.error({ message: err.message });
+  const onFinish = useCallback(async () => {
+    setConfirmLoading(true);
+    try {
+      if (!data || !data.products) {
+        throw new Error("Invalid information");
       }
-      setConfirmLoading(false);
-    },
-    [item, onOk, data]
-  );
+
+      if (!data.products.length) {
+        throw new Error("Product list is empty");
+      }
+
+      const result = {
+        ...data,
+        products: data.products.map((product) => ({
+          _id: product._id,
+          count: product.count,
+          name: product.name,
+        })),
+      };
+
+      await onOk(result);
+      // reset();
+    } catch (err) {
+      notification.error({ message: err.message });
+    }
+    setConfirmLoading(false);
+  }, [onOk, data]);
 
   const isEdit = !!item?._id;
   const title = isEdit ? "Sửa Thông tin đối tác" : "Thêm đối tác";
+
+  console.log(data);
 
   return (
     <Modal
       title={title}
       visible={!!item}
-      onOk={() => {
-        form.submit();
-      }}
+      onOk={() => form.submit()}
       onCancel={() => {
         reset();
         onCancel();
@@ -141,7 +140,11 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
             },
           ]}
         >
-          <Input value="1" name="nameCompany" onChange={handlerInputChange} />
+          <Input
+            value={data?.nameCompany}
+            name="nameCompany"
+            onChange={handlerInputChange}
+          />
         </Form.Item>
         <Form.Item
           name="address"
@@ -192,7 +195,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
         >
           <ChemistrySelector
             options={chemistryOptions}
-            value={data?.products?.map((product) => product._id)}
+            value={data?.products?.map((product) => product?._id)}
             onChange={onChangeSelector}
           />
         </Form.Item>
