@@ -1,8 +1,8 @@
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
 import { Button, notification } from "antd";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { remove } from "../../api/recipe";
+import { getById, remove } from "../../api/recipe";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
 import RecipeGroup from "./RecipeGroup";
@@ -11,7 +11,19 @@ import style from "./style";
 const Recipe = () => {
   const history = useHistory();
   const { id } = useParams();
+  const [data, setData] = useState();
   const [visible, setVisible] = useState(false);
+
+  const getData = useCallback(async () => {
+    if (!id) return;
+    const res = await getById(id);
+    setData(res.data[0]);
+  }, [id]);
+
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line no-use-before-define
+  }, [getData, id]);
 
   const onRemove = async () => {
     try {

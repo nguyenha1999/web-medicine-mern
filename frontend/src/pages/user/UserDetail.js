@@ -9,18 +9,6 @@ const UserDetail = ({ item, onOk, onCancel }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState();
 
-  const reset = () =>
-    setData({
-      username: "",
-      branch: "",
-      value: "",
-      email: "",
-      tel: "",
-      code: "",
-      password: "",
-      role: "",
-    });
-
   useEffect(() => {
     if (!item) return;
 
@@ -42,8 +30,10 @@ const UserDetail = ({ item, onOk, onCancel }) => {
         if (!!item?._id) {
           data._id = item._id;
         }
+        console.log(values);
+        console.log(data);
         await onOk(data);
-        reset();
+        // reset();
       } catch (err) {
         message.error("Cos lox xay ra");
       }

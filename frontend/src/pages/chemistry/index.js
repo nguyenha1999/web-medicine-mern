@@ -1,12 +1,12 @@
 import { CopyOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Col, Input, message, notification, Row, Table } from "antd";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { clone, create, get, remove, update } from "../../api/chemistry";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
-import { chemistry } from "../../recoils/Atoms";
+import { chemistry, RecipeAtom, UserInfoAtom } from "../../recoils/Atoms";
 import ChemistryDetail from "./ChemistryDetail";
 import ImageModal from "./ImageModal";
 import style from "./style";
@@ -16,6 +16,7 @@ const { Search } = Input;
 const Chemistry = () => {
   const history = useHistory();
   const [data, setData] = useRecoilState(chemistry);
+  const setRecipe = useSetRecoilState(RecipeAtom);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState({
@@ -26,25 +27,21 @@ const Chemistry = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const [removeId, setRemoveId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
-  const modalRef = useRef();
+
+  const userInfo = useRecoilValue(UserInfoAtom);
+  const { role } = userInfo;
 
   const getData = useCallback(
     async (page) => {
       setLoading(true);
 
-      // get data
-      const { current, pageSize } = pagination;
-      const res = await get(page || current, pageSize, search);
-      console.log(res);
+      const res = await get(page, role, search);
+
       setData(res?.data);
-      // setPagination({
-      //   ...pagination,
-      //   total: res?.data?.total || 0,
-      // });
 
       setLoading(false);
     },
-    [pagination, search, setData]
+    [role, search, setData]
   );
 
   const handleClone = useCallback(
@@ -69,15 +66,15 @@ const Chemistry = () => {
       try {
         await next(values);
         setEditingItem(null);
-        // notification.success({
-        //   message: `${isEdit ? "Update" : "Create"} chemistry successfully`,
-        // });
+        notification.success({
+          message: `${isEdit ? "Update" : "Create"} chemistry successfully`,
+        });
         message.success(`${isEdit ? "Sửa" : "Thêm"} hoá chất thành công !!`);
         getData(1);
       } catch (err) {
-        // notification.error({
-        //   message: err.message,
-        // });
+        notification.error({
+          message: err.message,
+        });
         message.error(err.message);
       }
     },
@@ -87,11 +84,11 @@ const Chemistry = () => {
   const onRemove = useCallback(async () => {
     if (!removeId) return;
     try {
-      await remove({ _id: removeId, isDeleted: true });
+      await remove({ _id: removeId, isDeleted: true, role: role });
       setRemoveId(null);
-      // notification.success({
-      //   message: "Remove chemistry successfully",
-      // });
+      notification.success({
+        message: "Remove chemistry successfully",
+      });
       message.success("Xoá hoá chất thành công !");
       getData(1);
     } catch (err) {
@@ -99,7 +96,7 @@ const Chemistry = () => {
         message: err.message,
       });
     }
-  }, [getData, removeId]);
+  }, [getData, removeId, role]);
 
   const onTableChange = (pagination) => setPagination(pagination);
 
@@ -119,19 +116,19 @@ const Chemistry = () => {
       key: "name",
     },
     {
-      title: "Sử dụng",
-      dataIndex: "use",
-      key: "use",
+      title: "Nhà cung cấp chính",
+      dataIndex: "partner",
+      key: "partner",
     },
-    // {
-    //   title: "Nhà cung cấp",
-    //   dataIndex: "partner",
-    //   key: "partner",
-    // },
     {
-      title: "Ảnh",
+      title: "Số lượng trong kho",
+      dataIndex: "count",
+      key: "count",
+    },
+    {
+      title: "Thông tin hoá chất",
       key: "image",
-      width: "10%",
+      width: "15%",
       render: (_text, record) => (
         <Button
           type="link"
@@ -150,11 +147,10 @@ const Chemistry = () => {
         <Button
           type="dashed"
           size="small"
-          onClick={() =>
-            history.push(
-              `/recipe/${record._id}/${record.recipeId || "create-recipe"}`
-            )
-          }
+          onClick={() => {
+            setRecipe(record);
+            history.push(`/recipe/${record.code}`);
+          }}
         >
           Xem công thức
         </Button>
@@ -172,6 +168,7 @@ const Chemistry = () => {
                 style={{
                   background: "#62a73b",
                   color: "#fff",
+                  borderRadius: "4px",
                 }}
                 size="small"
                 icon={<CopyOutlined />}
@@ -182,11 +179,14 @@ const Chemistry = () => {
             </Col>
             <Col span="auto">
               <Button
-                type="primary"
+                style={{
+                  backgroundColor: "#f56a00",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
                 size="small"
                 icon={<EditOutlined />}
                 onClick={() => {
-                  modalRef.current.show();
                   setEditingItem(record);
                 }}
               >
@@ -196,6 +196,9 @@ const Chemistry = () => {
             <Col span="auto">
               <Button
                 type="danger"
+                style={{
+                  borderRadius: "4px",
+                }}
                 size="small"
                 icon={<DeleteOutlined />}
                 onClick={() => setRemoveId(record._id)}
@@ -213,7 +216,7 @@ const Chemistry = () => {
     <Layout>
       <h2>Danh Sách Hoá Chất</h2>
       <Row>
-        <Col span={4}>
+        <Col span={5}>
           <Button
             color="success"
             style={{
@@ -223,7 +226,6 @@ const Chemistry = () => {
               color: "#fff",
             }}
             onClick={() => {
-              modalRef.current.show();
               setEditingItem({
                 name: "",
                 use: "",
@@ -239,6 +241,7 @@ const Chemistry = () => {
           <Search
             placeholder="Tìm kiếm"
             onSearch={(value) => setSearch(value)}
+            onChange={(e) => getData(1, role, e.target.value)}
             enterButton
           />
         </Col>
@@ -254,10 +257,7 @@ const Chemistry = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
-            // rowClassName={(record, index) => (
-            //   console.log(index),
-            //   index % 2 !== 0 ? "table-row-light" : "table-row-dark"
-            // )}
+            rowClassName={(record) => record.isDeleted && "table-hidden"}
           />
         </Col>
       </Row>
@@ -270,7 +270,6 @@ const Chemistry = () => {
         onCancel={() => setRemoveId(null)}
       />
       <ChemistryDetail
-        ref={modalRef}
         item={editingItem}
         onOk={updateData}
         onCancel={() => setEditingItem(null)}

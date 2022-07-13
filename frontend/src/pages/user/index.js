@@ -1,21 +1,12 @@
 import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
-import {
-  Avatar,
-  Button,
-  Col,
-  Input,
-  message,
-  notification,
-  Row,
-  Table
-} from "antd";
+import { Avatar, Button, Col, Input, notification, Row, Table } from "antd";
 import "jspdf-autotable";
 import { useCallback, useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { create, get, remove, update } from "../../api/user";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
-import { chemistry } from "../../recoils/Atoms";
+import { chemistry, UserInfoAtom } from "../../recoils/Atoms";
 import style from "./style";
 import UserDetail from "./UserDetail";
 
@@ -28,13 +19,14 @@ const User = () => {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
-    total: 200,
   });
   const ColorList = ["#f56a00", "#7265e6", "#ffbf00", "#00a2ae"];
   const color = Math.floor(Math.random() * ColorList.length);
 
   const [removeId, setRemoveId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
+  const userInfo = useRecoilValue(UserInfoAtom);
+  const { role } = userInfo;
 
   const getData = useCallback(
     async (page) => {
@@ -42,16 +34,12 @@ const User = () => {
 
       // get data
       const { current, pageSize } = pagination;
-      const res = await get(page || current, pageSize, search);
+      const res = await get(page, role || current, pageSize, search);
       setData(res?.data || []);
-      setPagination({
-        ...pagination,
-        total: res?.data?.total || 0,
-      });
 
       setLoading(false);
     },
-    [pagination, search]
+    [pagination, role, search, setData]
   );
 
   const updateData = useCallback(
@@ -63,14 +51,7 @@ const User = () => {
       try {
         await next(values);
         setEditingItem(null);
-        if (values.Id === "621126") {
-          message.error(`Mã Nhân Viên đã tồn tại`);
-        } else {
-          notification.success({
-            message: `${isEdit ? "Update" : "Create"} user successfully`,
-          });
-          getData(1);
-        }
+        getData(1);
       } catch (err) {
         notification.error({
           message: err.message,
@@ -83,7 +64,7 @@ const User = () => {
   const onRemove = useCallback(async () => {
     if (!removeId) return;
     try {
-      await remove(removeId);
+      await remove(removeId, role);
       setRemoveId(null);
       notification.success({
         message: "Remove bill successfully",
@@ -94,13 +75,13 @@ const User = () => {
         message: err.message,
       });
     }
-  }, [removeId, getData]);
+  }, [getData, removeId, role]);
 
   const onTableChange = (pagination) => setPagination(pagination);
 
   useEffect(() => {
     getData();
-  }, [search, pagination.current, pagination.pageSize]);
+  }, [search, pagination.pageSize, getData]);
 
   const columns = [
     {
@@ -160,7 +141,11 @@ const User = () => {
           <Row gutter={8}>
             <Col span="auto">
               <Button
-                type="primary"
+                style={{
+                  backgroundColor: "#f56a00",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
                 size="small"
                 icon={<EditOutlined />}
                 onClick={() => setEditingItem(record)}
@@ -171,6 +156,9 @@ const User = () => {
             <Col span="auto">
               <Button
                 type="danger"
+                style={{
+                  borderRadius: "4px",
+                }}
                 size="small"
                 icon={<DeleteOutlined />}
                 onClick={() => setRemoveId(record._id)}
@@ -188,9 +176,15 @@ const User = () => {
     <Layout>
       <h2>Danh Sách Nhân Viên</h2>
       <Row style={style.mb2}>
-        <Col span={4}>
+        <Col span={5}>
           <Button
             color="success"
+            style={{
+              background: "#319795",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              color: "#fff",
+            }}
             onClick={() =>
               setEditingItem({
                 createdAt: new Date().getTime(),
@@ -222,6 +216,7 @@ const User = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
+            rowClassName={(record) => record.activated && "table-hidden"}
             // rowClassName={(record) => !record.enabled && "disabled-row"}
           />
         </Col>

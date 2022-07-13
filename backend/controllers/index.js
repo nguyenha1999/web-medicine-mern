@@ -13,15 +13,12 @@ function processIndexWithParams(id) {
 module.exports = {
   index: { func: processIndex },
   "index/:id": processIndexWithParams,
-  "delete/:id": function (id) {
-    console.log(id);
-  },
+  "delete/:id": function (id) {},
   post_upload: {
     uploadConfig: {
       savedPath: "/uploaded",
     },
     func: (testField, _req_savedFiles) => {
-      console.log(_req_savedFiles);
       return { testField, savedPaths: _req_savedFiles };
     },
   },

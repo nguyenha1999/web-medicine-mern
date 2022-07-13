@@ -3,7 +3,10 @@ const UserHistory = require("../../model/userHistory");
 const crypto = require("crypto");
 
 module.exports = {
-  get_index: function () {
+  get_index: function (role) {
+    if (role === "admin") {
+      return Users.find();
+    }
     // return User.find({}, "-hashedPass -salt")
     //   .populate({
     //     path: "roles",
@@ -19,9 +22,19 @@ module.exports = {
   put_profile: function (_id, password) {
     return Users.findByIdAndUpdate(_id, { password });
   },
-  post_index: function (email, username, password, branch, value, tel, role) {
+  post_index: function (
+    email,
+    code,
+    username,
+    password,
+    branch,
+    value,
+    tel,
+    role
+  ) {
     return Users.create({
       email: email,
+      code: code,
       username: username,
       password: password,
       branch: branch,
@@ -57,39 +70,40 @@ module.exports = {
   //       return user;
   //     });
   // },
-put_index: function (){
-  
-}
-  post_activate: function (userId, reason, activated, username) {
-    return User.findById(userId)
-      .then((user) => {
-        user.activated = activated;
-        return user.save();
-      })
-      .then((r) => {
-        return UserHistory({
-          userId: r._id,
-          type: activated ? "activate" : "disable",
-          reason: reason,
-          username: username,
-        }).save();
-      });
-  },
-  post_assignRole: function (user, reason, username) {
-    return User.findByIdAndUpdate(user._id, user)
-      .then((data) => {
-        return UserHistory({
-          userId: user._id,
-          type: "Update Roles",
-          reason: reason,
-          username: username,
-        }).save();
-      })
-      .then((log) => {
-        return log.userId;
-      });
-  },
-  delete_index: function (id) {
+  put_index: function () {},
+  // post_activate: function (userId, reason, activated, username) {
+  //   return User.findById(userId)
+  //     .then((user) => {
+  //       user.activated = activated;
+  //       return user.save();
+  //     })
+  //     .then((r) => {
+  //       return UserHistory({
+  //         userId: r._id,
+  //         type: activated ? "activate" : "disable",
+  //         reason: reason,
+  //         username: username,
+  //       }).save();
+  //     });
+  // },
+  // post_assignRole: function (user, reason, username) {
+  //   return User.findByIdAndUpdate(user._id, user)
+  //     .then((data) => {
+  //       return UserHistory({
+  //         userId: user._id,
+  //         type: "Update Roles",
+  //         reason: reason,
+  //         username: username,
+  //       }).save();
+  //     })
+  //     .then((log) => {
+  //       return log.userId;
+  //     });
+  // },
+  delete_index: function (id, role) {
+    if (role === "admin") {
+      return Users.findByIdAndDelete(id);
+    }
     return Users.findByIdAndUpdate(id, { activated: false });
   },
 };

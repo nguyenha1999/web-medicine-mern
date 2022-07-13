@@ -2,17 +2,17 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Col, Input, notification, Row, Table } from "antd";
 import "jspdf-autotable";
 import { useCallback, useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { create, get, remove, update } from "../../api/partner";
 import ConfirmModal from "../../component/ConfirmModal";
 import Layout from "../../layout/layout";
-import { partner } from "../../recoils/Atoms";
+import { partner, UserInfoAtom } from "../../recoils/Atoms";
 import PartnerDetail from "./PartnerDetail";
 import style from "./style";
 
 const { Search } = Input;
 
-const Import = () => {
+const Partner = () => {
   const [data, setData] = useRecoilState(partner);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -24,6 +24,8 @@ const Import = () => {
 
   const [removeId, setRemoveId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
+  const userInfo = useRecoilValue(UserInfoAtom);
+  const { role } = userInfo;
 
   const getData = useCallback(
     async (page) => {
@@ -31,16 +33,16 @@ const Import = () => {
 
       // get data
       const { current, pageSize } = pagination;
-      const res = await get(page || current, pageSize, search);
+      const res = await get(page, role || current, pageSize, search);
       setData(res?.data || []);
-      setPagination({
-        ...pagination,
-        total: res?.data?.total || 0,
-      });
+      // setPagination({
+      //   ...pagination,
+      //   total: res?.data?.total || 0,
+      // });
 
       setLoading(false);
     },
-    [pagination, search, setData]
+    [pagination, role, search, setData]
   );
 
   const updateData = useCallback(
@@ -68,7 +70,7 @@ const Import = () => {
   const onRemove = useCallback(async () => {
     if (!removeId) return;
     try {
-      await remove(removeId);
+      await remove(removeId, role);
       setRemoveId(null);
       notification.success({
         message: "Xoá đối tác thành công!",
@@ -79,13 +81,13 @@ const Import = () => {
         message: err.message,
       });
     }
-  }, [removeId, getData]);
+  }, [removeId, role, getData]);
 
   const onTableChange = (pagination) => setPagination(pagination);
 
   useEffect(() => {
     getData();
-  }, [search, pagination.current, pagination.pageSize]);
+  }, [search, pagination.pageSize, getData]);
 
   const columns = [
     {
@@ -164,9 +166,15 @@ const Import = () => {
     <Layout>
       <h2>Danh sách đối tác</h2>
       <Row style={style.mb2}>
-        <Col span={4}>
+        <Col span={5}>
           <Button
             color="success"
+            style={{
+              background: "#319795",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              color: "#fff",
+            }}
             onClick={() =>
               setEditingItem({
                 adress: " ",
@@ -199,6 +207,7 @@ const Import = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
+            rowClassName={(record) => record.isDeleted && "table-hidden"}
             // rowClassName={(record) => !record.enabled && "disabled-row"}
           />
         </Col>
@@ -219,4 +228,4 @@ const Import = () => {
   );
 };
 
-export default Import;
+export default Partner;

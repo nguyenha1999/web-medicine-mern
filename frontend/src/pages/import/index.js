@@ -1,4 +1,5 @@
 import {
+  CopyOutlined,
   DeleteOutlined,
   EditOutlined,
   FilePdfOutlined,
@@ -25,7 +26,7 @@ const Import = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const userInfo = useRecoilValue(UserInfoAtom);
-  const { code, username } = userInfo;
+  const { code, username, role } = userInfo;
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
@@ -42,7 +43,7 @@ const Import = () => {
       // get data
       const { current, pageSize } = pagination;
 
-      const res = await get(page || current, pageSize, search);
+      const res = await get(page, role || current, pageSize, search);
       setData(res?.data);
       console.log(res?.data);
 
@@ -52,7 +53,7 @@ const Import = () => {
       // });
       setLoading(false);
     },
-    [pagination, search, setData]
+    [pagination, role, search, setData]
   );
 
   const updateData = useCallback(
@@ -80,7 +81,7 @@ const Import = () => {
   const onRemove = useCallback(async () => {
     if (!removeId) return;
     try {
-      await remove(removeId);
+      await remove(removeId, role);
       setRemoveId(null);
       notification.success({
         message: "Remove bill successfully",
@@ -91,7 +92,7 @@ const Import = () => {
         message: err.message,
       });
     }
-  }, [removeId, getData]);
+  }, [removeId, role, getData]);
 
   const onTableChange = (pagination) => setPagination(pagination);
 
@@ -174,7 +175,7 @@ const Import = () => {
     {
       title: "Sản phẩm",
       key: "products",
-      width: "30%",
+      width: "20%",
       render: (_text, record) => {
         console.log(record);
         return (
@@ -190,18 +191,19 @@ const Import = () => {
     },
     {
       title: "Tổng tiền",
-      key: "prices",
+      key: "totalPrice",
+      dataIndex: "totalPrice",
       width: "15%",
-      render: (_text, record) => {
-        console.log(record);
-        return (
-          Array.isArray(record.products) &&
-          record.products.length > 0 &&
-          record.products
-            .map((product) => product.count * product.price)
-            .reduce((curr, pre) => curr + pre)
-        );
-      },
+      // render: (_text, record) => {
+      //   console.log(record);
+      //   return (
+      //     Array.isArray(record.products) &&
+      //     record.products.length > 0 &&
+      //     record.products
+      //       .map((product) => product.count * product.price)
+      //       .reduce((curr, pre) => curr + pre)
+      //   );
+      // },
     },
     {
       title: "Nhân viên",
@@ -215,7 +217,7 @@ const Import = () => {
     {
       title: "Hành động",
       key: "action",
-      width: "25%",
+      width: "35%",
       render: (_text, record) => {
         return (
           <Row gutter={8}>
@@ -223,6 +225,9 @@ const Import = () => {
               <Button
                 type="warning"
                 size="small"
+                style={{
+                  borderRadius: "4px",
+                }}
                 icon={<FilePdfOutlined />}
                 onClick={() => print(record)}
               >
@@ -231,7 +236,24 @@ const Import = () => {
             </Col>
             <Col span="auto">
               <Button
-                type="primary"
+                style={{
+                  background: "#62a73b",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
+                size="small"
+                icon={<CopyOutlined />}
+              >
+                History
+              </Button>
+            </Col>
+            <Col span="auto">
+              <Button
+                style={{
+                  backgroundColor: "#f56a00",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
                 size="small"
                 icon={<EditOutlined />}
                 onClick={() => setEditingItem(record)}
@@ -242,6 +264,9 @@ const Import = () => {
             <Col span="auto">
               <Button
                 type="danger"
+                style={{
+                  borderRadius: "4px",
+                }}
                 size="small"
                 icon={<DeleteOutlined />}
                 onClick={() => setRemoveId(record._id)}
@@ -259,24 +284,31 @@ const Import = () => {
     <Layout>
       <h2>Danh Sách Đơn Nhập</h2>
       <Row style={style.mb2}>
-        <Col span={4}>
+        <Col span={5}>
           <Button
             color="success"
-            onClick={() =>
+            style={{
+              background: "#319795",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              color: "#fff",
+            }}
+            onClick={() => {
               setEditingItem({
                 createdAt: new Date().getTime(),
                 isExport: false,
                 products: [],
-              })
-            }
+              });
+            }}
           >
-            Thêm Hoá Đơn Nhập
+            THÊM HOÁ ĐƠN NHẬP
           </Button>
         </Col>
-        <Col span={12}>
+        <Col span={12} style={style.mb2}>
           <Search
-            placeholder="Search"
+            placeholder="Tìm kiếm"
             onSearch={(value) => setSearch(value)}
+            onChange={(e) => getData(1, role, e.target.value)}
             enterButton
           />
         </Col>
@@ -293,23 +325,7 @@ const Import = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
-            // rowClassName={(record) => !record.enabled && "disabled-row"}
-            // expandable={{
-            //   expandedRowRender: (record) => (
-            //     <div>
-            //       <h5>PRODUCT LIST</h5>
-            //       {!!record.products?.length ? (
-            //         record.products.map((product) => (
-            //           <div style={style.bold}>
-            //             {product.name}: {product.count}
-            //           </div>
-            //         ))
-            //       ) : (
-            //         <span>No products.</span>
-            //       )}
-            //     </div>
-            //   ),
-            // }}
+            rowClassName={(record) => record.isDeleted && "table-hidden"}
           />
         </Col>
       </Row>

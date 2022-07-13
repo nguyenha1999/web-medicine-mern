@@ -13,6 +13,7 @@ const ImportSchema = new mongoose.Schema({
   ],
   isDeleted: Boolean,
   code: String,
+  totalPrice: Number,
   products: [
     {
       name: String,

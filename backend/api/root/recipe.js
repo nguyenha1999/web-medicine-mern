@@ -1,20 +1,14 @@
-const Parners = require("../../model/partners");
+const Recipe = require("../../model/chem");
+
 module.exports = {
-  index: function () {
-    return Parners.find();
-    // .skip((page - 1) * limit)
-    // .limit(limit);
-  },
-  post_index: function (andress, hotline, nameCompany) {
-    return Parners.create({
-      andress: andress,
-      hotline: hotline,
-      nameCompany: nameCompany,
-      isDeleted: false,
-    });
+  index: async function (code) {
+    const test = await Recipe.findOne({ code: code }).populate(
+      "subChems.chemId"
+    );
+    return test;
   },
   put_index: function (_id, name, code, price, use) {
-    return Parners.findByIdAndUpdate(_id, {
+    return Recipes.findByIdAndUpdate(_id, {
       use,
       name,
       code,
@@ -22,6 +16,6 @@ module.exports = {
     });
   },
   delete_index: function (id) {
-    return Parners.findByIdAndUpdate(id, { isDeleted: true });
+    return Recipes.findByIdAndUpdate(id, { isDeleted: true });
   },
 };

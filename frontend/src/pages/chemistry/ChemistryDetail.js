@@ -1,24 +1,79 @@
 import { Form, Input, Modal, notification } from "antd";
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useMutation } from "react-query";
-import { uploadFile } from "../../api/axiosClient";
+import { uploadFile } from "../../api/chemistry";
+
 // import TextArea from "../../component/TextArea";
-import API from "../../api/api";
 import { formConfig } from "./formConfig";
 import ImagePreview from "./ImagePreview";
 
 const IMAGE_ID = "imagepreview";
 
-export default forwardRef(({ item, onOk, onCancel }, ref ) => {
+export default memo(({ item, onOk, onCancel }, ref) => {
   const { TextArea } = Input;
-  const [show, setShow] = useState(false);
+  function list_to_tree(list) {
+    var map = {},
+      node,
+      roots = [],
+      i;
+
+    for (i = 0; i < list.length; i += 1) {
+      map[list[i].id] = i; // initialize the map
+      list[i].children = []; // initialize the children
+    }
+
+    for (i = 0; i < list.length; i += 1) {
+      node = list[i];
+      if (node.parentId !== "0") {
+        // if you have dangling branches check that map[node.parentId] exists
+        list[map[node.parentId]].children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+    return roots;
+  }
+
+  var entries = [
+    {
+      id: "12",
+      parentId: "0",
+      text: "Man",
+      level: "1",
+      children: null,
+    },
+    {
+      id: "6",
+      parentId: "12",
+      text: "Boy",
+      level: "2",
+      children: null,
+    },
+    {
+      id: "7",
+      parentId: "12",
+      text: "Other",
+      level: "2",
+      children: null,
+    },
+    {
+      id: "9",
+      parentId: "0",
+      text: "Woman",
+      level: "1",
+      children: null,
+    },
+    {
+      id: "11",
+      parentId: "9",
+      text: "Girl",
+      level: "2",
+      children: null,
+    },
+  ];
+
+  console.log(list_to_tree(entries));
+
   const [confirmLoading, setConfirmLoading] = useState(false);
   const method = useForm();
   const [file, setFile] = useState(null);
@@ -28,41 +83,8 @@ export default forwardRef(({ item, onOk, onCancel }, ref ) => {
   const isEdit = !!item?._id;
   const title = isEdit ? "Sửa hoá chất" : "Thêm hoá chất";
 
-  useImperativeHandle(ref, () => ({
-    show() {
-      setShow(true);
-    },
-  }));
-
-  const checkExistMutate = useMutation((data) => {
-    const config = {
-      params: data,
-      url: `root/chemistry/`,
-    };
-    return API.request(config);
-  });
-
-  const postData = useMutation(
-    (data) => {
-      console.log(data);
-      const config = {
-        method: "POST",
-        params: data,
-        url: `root/chemistry`,
-      };
-      return API.request(config);
-    },
-    {
-      onSuccess: () => {
-        setConfirmLoading(false);
-      },
-    }
-  );
-
   useEffect(() => {
     if (!item) return;
-
-    console.log(item);
 
     form.setFieldsValue({
       name: item.name,
@@ -88,22 +110,21 @@ export default forwardRef(({ item, onOk, onCancel }, ref ) => {
           data._id = item._id;
         }
 
-        if (!!file) {
-          const formData = new FormData();
-          const fileName = file.name;
-          formData.append("file", file, fileName);
-          const res = await uploadFile(formData);
-          data.imageUrl = res.data;
-        }
-
-        postData.mutate(data);
-        resetImage();
+        let formData = new FormData();
+        console.log(file);
+        formData.append("file", file);
+        console.log(formData);
+        const res = await uploadFile(file);
+        console.log(res?.imageUrl);
+        data.imageUrl = res;
+        await onOk(data);
+        // resetImage();
       } catch (err) {
         notification.error({ message: err.message });
       }
       setConfirmLoading(false);
     },
-    [file, item, postData]
+    [file, item, onOk]
   );
 
   const renderInput = (key) => {

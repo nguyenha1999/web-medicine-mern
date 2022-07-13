@@ -1,6 +1,6 @@
 import { Skeleton } from "antd";
 import PropTypes from "prop-types";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 
 const Routers = (props) => {
   const { component } = props;

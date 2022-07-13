@@ -3,7 +3,7 @@ import { Group } from "@visx/group";
 import { hierarchy, Tree } from "@visx/hierarchy";
 import { LinkVertical } from "@visx/shape";
 import { notification } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { create, getById, update } from "../../api/recipe";
 import EditNodeModal from "./EditNodeModal";
@@ -17,7 +17,9 @@ const RecipeGroup = ({
   margin = defaultMargin,
 }) => {
   const history = useHistory();
-  const { id, productId } = useParams();
+
+  const param = useParams();
+  const { id, productId } = param;
   const [editingNode, setEditingNode] = useState(null);
   const [data, setData] = useState({
     name: "Root name",
@@ -26,19 +28,21 @@ const RecipeGroup = ({
 
   const forceUpdate = useForceUpdate();
 
-  useEffect(() => {
-    getData();
-  }, [id]);
-
-  const getData = async () => {
+  const getData = useCallback(async () => {
     if (!id) return;
     const res = await getById(id);
     setData(res.data);
-  };
+  }, [id]);
 
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line no-use-before-define
+  }, [getData, id]);
   const getChild = (parent, childId) => {
     return parent.children.find((item) => item._id === childId);
   };
+
+  console.log(data);
 
   const getParentFromRoot = () => {
     const parentIds = pathIds.slice(0, pathIds.length - 1);
@@ -60,7 +64,7 @@ const RecipeGroup = ({
     return child;
   };
 
-  const getNodeParentIds = (node) => {
+  const getNodeParentIds = useCallback((node) => {
     if (!node) return [];
     try {
       let ids = [node.data._id];
@@ -73,13 +77,13 @@ const RecipeGroup = ({
       console.error(err);
       return [];
     }
-  };
+  }, []);
 
   const pathIds = useMemo(() => {
     const ids = getNodeParentIds(editingNode);
     if (ids.length === 1) return ids;
     return ids.reverse().slice(1);
-  }, [editingNode]);
+  }, [editingNode, getNodeParentIds]);
 
   const onRemove = async () => {
     try {
@@ -235,6 +239,7 @@ const RecipeGroup = ({
       <EditNodeModal
         node={editingNode}
         onOk={onOk}
+        data={data}
         onOkRoot={onOkRoot}
         onCancel={onCancel}
         onRemove={onRemove}
