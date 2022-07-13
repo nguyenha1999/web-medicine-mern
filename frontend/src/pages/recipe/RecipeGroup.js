@@ -20,7 +20,6 @@ const RecipeGroup = ({
 
   const param = useParams();
   const { id, productId } = param;
-  console.log(param);
   const [editingNode, setEditingNode] = useState(null);
   const [data, setData] = useState({
     name: "Root name",
@@ -42,6 +41,8 @@ const RecipeGroup = ({
   const getChild = (parent, childId) => {
     return parent.children.find((item) => item._id === childId);
   };
+
+  console.log(data);
 
   const getParentFromRoot = () => {
     const parentIds = pathIds.slice(0, pathIds.length - 1);
@@ -238,6 +239,7 @@ const RecipeGroup = ({
       <EditNodeModal
         node={editingNode}
         onOk={onOk}
+        data={data}
         onOkRoot={onOkRoot}
         onCancel={onCancel}
         onRemove={onRemove}

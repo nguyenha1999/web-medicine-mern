@@ -191,18 +191,19 @@ const Import = () => {
     },
     {
       title: "Tổng tiền",
-      key: "prices",
+      key: "totalPrice",
+      dataIndex: "totalPrice",
       width: "15%",
-      render: (_text, record) => {
-        console.log(record);
-        return (
-          Array.isArray(record.products) &&
-          record.products.length > 0 &&
-          record.products
-            .map((product) => product.count * product.price)
-            .reduce((curr, pre) => curr + pre)
-        );
-      },
+      // render: (_text, record) => {
+      //   console.log(record);
+      //   return (
+      //     Array.isArray(record.products) &&
+      //     record.products.length > 0 &&
+      //     record.products
+      //       .map((product) => product.count * product.price)
+      //       .reduce((curr, pre) => curr + pre)
+      //   );
+      // },
     },
     {
       title: "Nhân viên",

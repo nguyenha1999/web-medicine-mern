@@ -1,26 +1,28 @@
-import React, { useState } from "react"
-import { Modal } from "antd"
+import { Modal } from "antd";
+import { useState } from "react";
 
 const ConfirmModal = ({ visible, title, message, onOk, onCancel }) => {
-  const [confirmLoading, setConfirmLoading] = useState(false)
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const onConfirm = async () => {
-    setConfirmLoading(true)
+    setConfirmLoading(true);
 
-    await onOk()
+    await onOk();
 
-    setConfirmLoading(false)
-  }
+    setConfirmLoading(false);
+  };
 
-  return <Modal 
-    visible={visible} 
-    title={title} 
-    onOk={onConfirm} 
-    onCancel={onCancel}
-    confirmLoading={confirmLoading}
-  >
-    <p>{message}</p>
-  </Modal>
-}
+  return (
+    <Modal
+      visible={visible}
+      title={title}
+      onOk={onConfirm}
+      onCancel={onCancel}
+      confirmLoading={confirmLoading}
+    >
+      <p>{message}</p>
+    </Modal>
+  );
+};
 
-export default ConfirmModal
+export default ConfirmModal;

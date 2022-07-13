@@ -1,10 +1,17 @@
 import { Button, Card, Col, Input, Modal, notification, Row } from "antd";
 import { useEffect, useState } from "react";
-import shortid from "shortid";
+import { create } from "./../../api/recipe";
 import ChildrenTable from "./ChildrenTable";
 import style from "./style";
 
-const EditNodeModal = ({ node, onOk, onOkRoot, onCancel, onRemove }) => {
+const EditNodeModal = ({
+  node,
+  onOk,
+  onOkRoot,
+  onCancel,
+  onRemove,
+  data: dataRoot,
+}) => {
   const [data, setData] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [newChild, setNewChild] = useState({
@@ -27,38 +34,42 @@ const EditNodeModal = ({ node, onOk, onOkRoot, onCancel, onRemove }) => {
     });
   };
 
+  console.log(dataRoot);
   const onAddChild = () => {
-    if (
-      !newChild ||
-      Object.values(newChild).some(
-        (value) => !value || (typeof value === "string" && !value.trim())
-      )
-    )
-      return;
+    // if (
+    //   !newChild ||
+    //   Object.values(newChild).some(
+    //     (value) => !value || (typeof value === "string" && !value.trim())
+    //   )
+    // )
+    //   return;
 
     const newChildData = {
       ...newChild,
-      _id: shortid.generate(),
-      isNew: true,
+      parentId: dataRoot._id,
+      depth: dataRoot.depth + 1,
     };
 
-    if (data.children && data.children.length) {
-      setData({
-        ...data,
-        children: [...data.children, newChildData],
-      });
-    } else {
-      setData({
-        ...data,
-        children: [newChildData],
-      });
-    }
+    setData(newChild);
+    create(newChildData);
 
-    setNewChild({
-      name: "",
-      code: "",
-      ratio: 0,
-    });
+    // if (data.children && data.children.length) {
+    //   setData({
+    //     ...data,
+    //     children: [...data.children, newChildData],
+    //   });
+    // } else {
+    //   setData({
+    //     ...data,
+    //     children: [newChildData],
+    //   });
+    // }
+
+    // setNewChild({
+    //   name: "",
+    //   code: "",
+    //   ratio: 0,
+    // });
   };
 
   const isRoot = node && !node.depth;
@@ -145,7 +156,7 @@ const EditNodeModal = ({ node, onOk, onOkRoot, onCancel, onRemove }) => {
       }
       setData(newNode);
     }
-  }, [node]);
+  }, [isRoot, node]);
 
   if (!data) return null;
 

@@ -15,11 +15,16 @@ module.exports = {
       let newCount = countChemistry[0].count - e.count;
       await Chemistries.findByIdAndUpdate(e._id, { count: newCount });
     });
+
+    const price = products
+      .map((product) => product.count * product.price)
+      .reduce((curr, pre) => curr + pre);
     return Exports.create({
       isExport: !isExport,
       createdAt: createdAt,
       products: products,
       isDeleted: false,
+      totalPrice: price,
       staffs: staff,
       code: `EPB_${new Date().getMilliseconds()}`,
     });

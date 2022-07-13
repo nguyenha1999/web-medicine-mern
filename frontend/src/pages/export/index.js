@@ -177,14 +177,9 @@ const Export = () => {
     },
     {
       title: "Tổng tiền",
-      key: "prices",
+      key: "totalPrice",
+      dataIndex: "totalPrice",
       width: "15%",
-      render: (_text, record) =>
-        Array.isArray(record?.products) &&
-        record?.products.length > 0 &&
-        record.products
-          .map((product) => product.count * product.price)
-          .reduce((curr, pre) => curr + pre),
     },
     {
       title: "Nhân viên",

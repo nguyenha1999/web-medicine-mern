@@ -6,7 +6,8 @@ import {
 } from "@ant-design/icons";
 import { Col, Row } from "antd";
 import moment from "moment";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { get } from "../../api/home";
 import Layout from "../../layout/layout.js";
 import CardOverview from "./sub/card.js";
 import ColumnChart from "./sub/chart-column.js/index.js";
@@ -54,6 +55,15 @@ function fillDataChart(data) {
 const Home = () => {
   const [dataCarts, setDataCarts] = useState({});
   const [dataChart, setDataChart] = useState({});
+
+  const getData = useCallback(async () => {
+    const res = await get();
+    console.log(res);
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
   return (
     <Layout>

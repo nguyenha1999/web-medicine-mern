@@ -3,8 +3,6 @@ import { Select } from "antd";
 const { Option } = Select;
 
 const ChemistrySelector = ({ options, value, onChange }) => {
-  console.log(options);
-  console.log(value);
   return (
     <Select
       mode="multiple"

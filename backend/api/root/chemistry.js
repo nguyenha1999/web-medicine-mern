@@ -1,6 +1,6 @@
 const ServerError = require("../../utils/serverError");
 const Chemistries = require("../../model/chemistry");
-const Recipe = require("../../model/recipe");
+const Recipe = require("../../model/chem");
 
 module.exports = {
   index: function (role) {
@@ -15,10 +15,10 @@ module.exports = {
     Recipe.create({
       name: name,
       code: code,
-      ratio: 100,
-      childrenId: "",
-      parendId: "",
-      depth: 0,
+      price: price,
+      isDeleted: false,
+      use: use,
+      subChem: [],
     });
 
     return Chemistries.create({

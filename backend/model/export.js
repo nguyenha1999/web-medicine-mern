@@ -12,6 +12,7 @@ const ExportSchema = new mongoose.Schema({
     },
   ],
   isDeleted: Boolean,
+  totalPrice: Number,
   code: String,
   products: [
     {

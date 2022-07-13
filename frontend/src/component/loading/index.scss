@@ -1,0 +1,22 @@
+@keyframes spinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  position: absolute;
+  z-index: 999999;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 2px solid #8f9f8e;
+  border-radius: 50%;
+  animation: spinner 0.8s linear infinite;
+}
