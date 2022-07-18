@@ -23,7 +23,6 @@ const Profile = () => {
 
   const submit = async (values) => {
     try {
-      console.log(values);
       await updateProfile({ ...values, _id: user?._id });
       message.success(`Chỉnh sửa thông tin ${user?.username} thành công !!!`);
     } catch (err) {

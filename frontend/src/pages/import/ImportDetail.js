@@ -139,8 +139,6 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
         }),
       };
 
-      console.log(result);
-
       await onOk(result);
     } catch (err) {
       notification.error({ message: err.message });

@@ -8,22 +8,29 @@ module.exports = {
       return Chemistries.find();
     }
 
-    return Chemistries.find({ isDeleted: false });
+    return Chemistries.find();
   },
 
-  post_index: function (name, code, use, price) {
+  post_index: async function (name, code, use, price) {
     Recipe.create({
       name: name,
       code: code,
       price: price,
       isDeleted: false,
       use: use,
-      subChem: [],
+      children: [],
     });
 
-    return Chemistries.create({
+    const isExit = await Chemistries.exists({ code });
+
+    if (isExit) {
+      return { error: true, message: "Hoá chất đã tồn tại" };
+    }
+
+    return await Chemistries.create({
       name: name,
       code: code,
+      countExportOfMounth: 0,
       use: use,
       price: price,
       count: 1,
@@ -55,6 +62,7 @@ module.exports = {
       code: newCode,
       use: use,
       price: price,
+      count: 1,
       isDeleted: false,
     });
   },

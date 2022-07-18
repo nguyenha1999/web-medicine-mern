@@ -9,6 +9,7 @@ const ChemSchema = new mongoose.Schema({
   name: String,
   code: String,
   price: Number,
+  countExportOfMounth: Number,
   isDeleted: Boolean,
   count: Number,
   use: String,
@@ -17,7 +18,7 @@ const ChemSchema = new mongoose.Schema({
   product: String,
   createdAt: { type: Date, default: Date.now },
   ///subChems: [{ subChem: ChemSchema, ratio: Number }],
-  subChems: [SubChem],
+  children: [SubChem],
 });
 
 module.exports = mongoose.model("chems", ChemSchema);

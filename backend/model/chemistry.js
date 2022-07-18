@@ -8,6 +8,7 @@ const ChemistrySchema = new mongoose.Schema({
   count: Number,
   use: String,
   nameCompany: String,
+  countExportOfMounth: Number,
   staff: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Users" }],
   product: String,
   createdAt: { type: Date, default: Date.now },

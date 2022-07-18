@@ -1,5 +1,14 @@
 import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Button, Col, Input, notification, Row, Table } from "antd";
+import {
+  Avatar,
+  Button,
+  Col,
+  Input,
+  message,
+  notification,
+  Row,
+  Table,
+} from "antd";
 import "jspdf-autotable";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -49,13 +58,16 @@ const User = () => {
       const next = isEdit ? update : create;
 
       try {
-        await next(values);
-        setEditingItem(null);
-        getData(1);
-      } catch (err) {
-        notification.error({
-          message: err.message,
-        });
+        const resolve = await next(values);
+        if (resolve.data.error) {
+          throw new Error(resolve.data.message);
+        } else {
+          message.success(`${isEdit ? "Sửa" : "Thêm"} nhân viên thành công !!`);
+          setEditingItem(null);
+          getData(1);
+        }
+      } catch (error) {
+        message.error(error.message);
       }
     },
     [editingItem, getData]
@@ -67,7 +79,7 @@ const User = () => {
       await remove(removeId, role);
       setRemoveId(null);
       notification.success({
-        message: "Remove bill successfully",
+        message: "Xoá nhân viên thành công",
       });
       getData(1);
     } catch (err) {

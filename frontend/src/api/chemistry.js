@@ -18,7 +18,7 @@ export const clone = (data) => {
 };
 
 export const uploadFile = (formData) => {
-  apiUpload.post("root/image", formData);
+  apiUpload.post("post_upload", formData);
 };
 
 export const getSelectors = () => axiosClient.get("root/chemistry");

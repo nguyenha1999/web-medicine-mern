@@ -1,5 +1,5 @@
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
-import { Button, notification } from "antd";
+import { Button, message } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { getById, remove } from "../../api/recipe";
@@ -17,7 +17,7 @@ const Recipe = () => {
   const getData = useCallback(async () => {
     if (!id) return;
     const res = await getById(id);
-    setData(res.data[0]);
+    setData(res.data);
   }, [id]);
 
   useEffect(() => {
@@ -28,14 +28,10 @@ const Recipe = () => {
   const onRemove = async () => {
     try {
       await remove(id);
-      notification.success({
-        message: "Xoá công thức thành công",
-      });
+      message.success("Xoá công thức thành công");
       history.push("/");
     } catch (err) {
-      notification.error({
-        message: err.message,
-      });
+      message.error(err.message);
     }
   };
 

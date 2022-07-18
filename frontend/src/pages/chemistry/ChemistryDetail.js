@@ -72,8 +72,6 @@ export default memo(({ item, onOk, onCancel }, ref) => {
     },
   ];
 
-  console.log(list_to_tree(entries));
-
   const [confirmLoading, setConfirmLoading] = useState(false);
   const method = useForm();
   const [file, setFile] = useState(null);
@@ -111,16 +109,12 @@ export default memo(({ item, onOk, onCancel }, ref) => {
         }
 
         let formData = new FormData();
-        console.log(file);
         formData.append("file", file);
-        console.log(formData);
         const res = await uploadFile(file);
-        console.log(res?.imageUrl);
         data.imageUrl = res;
         await onOk(data);
-        // resetImage();
-      } catch (err) {
-        notification.error({ message: err.message });
+      } catch (error) {
+        notification.error({ message: error.message });
       }
       setConfirmLoading(false);
     },

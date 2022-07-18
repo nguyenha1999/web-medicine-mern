@@ -30,8 +30,6 @@ const UserDetail = ({ item, onOk, onCancel }) => {
         if (!!item?._id) {
           data._id = item._id;
         }
-        console.log(values);
-        console.log(data);
         await onOk(data);
         // reset();
       } catch (err) {
