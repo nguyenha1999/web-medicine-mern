@@ -34,10 +34,11 @@ const listDates = enumerateDaysBetweenDates(
 ).map((item) => moment(item).format("DD/MM/YYYY"));
 
 function getDataCurentMonth(data) {
+  console.log(data);
   const dataCurentMonthIndex = data.findIndex(
-    (item) => item.date === startOfMonthDmy
+    (item) => item.date == startOfMonthDmy
   );
-  if (dataCurentMonthIndex !== -1) {
+  if (dataCurentMonthIndex != -1) {
     return data.slice(dataCurentMonthIndex).map((item) => item.count);
   }
   return [];
@@ -45,25 +46,28 @@ function getDataCurentMonth(data) {
 
 function fillDataChart(data) {
   return {
-    document: getDataCurentMonth(6),
-    procedure: getDataCurentMonth(7),
-    upload: getDataCurentMonth(8),
-    download: getDataCurentMonth(9),
+    export: getDataCurentMonth(data.exportTrack),
+    import: getDataCurentMonth(data.importTrack),
   };
 }
 
 const Home = () => {
   const [dataCarts, setDataCarts] = useState({});
-  const [dataChart, setDataChart] = useState({});
+  const [dataChartColumn, setDataChartColumn] = useState({});
+  const [dataPie, setDataPie] = useState({});
 
   const getData = useCallback(async () => {
     const res = await get();
-    console.log(res);
+    setDataPie(res.data);
+    setDataCarts(res.data);
+    setDataChartColumn(fillDataChart(res.data));
   }, []);
 
   useEffect(() => {
     getData();
   }, [getData]);
+
+  const { importTotal, exportTotal } = dataCarts ?? {};
 
   return (
     <Layout>
@@ -74,7 +78,7 @@ const Home = () => {
               title={"Số đơn nhập"}
               icon={<BookFilled style={{ fontSize: 30, color: "#16a085" }} />}
               action={"document"}
-              data={dataCarts.document}
+              data={importTotal && importTotal[0].countI}
             />
           </Col>
           <Col span={6}>
@@ -82,7 +86,7 @@ const Home = () => {
               title={"Số đơn xuất"}
               icon={<HddFilled style={{ fontSize: 30, color: "#2980b9" }} />}
               action={"procedure"}
-              data={dataCarts.procedure}
+              data={exportTotal && exportTotal[0].countE}
             />
           </Col>
           <Col span={6}>
@@ -92,7 +96,7 @@ const Home = () => {
                 <UploadOutlined style={{ fontSize: 30, color: "#27ae60" }} />
               }
               action={"upload"}
-              data={dataCarts.upload}
+              data={exportTotal && exportTotal[0].totalExported}
             />
           </Col>
           <Col span={6}>
@@ -102,17 +106,16 @@ const Home = () => {
                 <DownloadOutlined style={{ fontSize: 30, color: "#e67e22" }} />
               }
               action={"download"}
-              data={dataCarts.download}
+              data={dataCarts.y}
             />
           </Col>
         </Row>
         <Row gutter={16} style={{ marginTop: "8px" }}>
           <Col span={12}>
-            <ColumnChart />
+            <ColumnChart categories={listDates} data={dataChartColumn} />
           </Col>
           <Col span={12}>
-            {" "}
-            <PieChart />
+            <PieChart data={dataPie} />
           </Col>
         </Row>
       </div>

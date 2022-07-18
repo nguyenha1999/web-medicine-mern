@@ -8,12 +8,13 @@ const startOfMonth = moment().clone().startOf("month").format("YYYY-MM-DD");
 function CardOverview(props) {
   const [total, setTotal] = useState(0);
   const [ratio, setRatio] = useState(0);
+  console.log(props);
 
   if (props.data?.length) {
     const dataCurentMonthIndex = props.data.findIndex(
       (item) => item.date === startOfMonth
     );
-    if (dataCurentMonthIndex != -1) {
+    if (dataCurentMonthIndex !== -1) {
       const dataLastMonth = props.data.splice(0, dataCurentMonthIndex);
       const dataCurentMonth = props.data.splice(dataCurentMonth);
       let totalLastMonth = dataLastMonth
@@ -56,7 +57,7 @@ function CardOverview(props) {
       <div className="position-absolute top-8-px end-8-px">{props.icon}</div>
       <h2>
         <Tooltip placement="topLeft" title={"Tổng số lượt trong tháng"}>
-          {total}
+          {props.data}
         </Tooltip>
       </h2>
 

@@ -1,5 +1,5 @@
 import { CopyOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Col, Input, message, notification, Row, Table } from "antd";
+import { Button, Col, Input, message, Row, Table } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -47,11 +47,10 @@ const Chemistry = () => {
   const handleClone = useCallback(
     async (value) => {
       try {
-        console.log(value);
         await clone(value);
         getData(1);
       } catch (error) {
-        message.error("không clone đc");
+        message.error("Clone thất bại");
       }
     },
     [getData]
@@ -64,18 +63,16 @@ const Chemistry = () => {
       const next = isEdit ? update : create;
 
       try {
-        await next(values);
-        setEditingItem(null);
-        notification.success({
-          message: `${isEdit ? "Update" : "Create"} chemistry successfully`,
-        });
-        message.success(`${isEdit ? "Sửa" : "Thêm"} hoá chất thành công !!`);
-        getData(1);
-      } catch (err) {
-        notification.error({
-          message: err.message,
-        });
-        message.error(err.message);
+        const resolve = await next(values);
+        if (resolve.data.error) {
+          throw new Error(resolve.data.message);
+        } else {
+          message.success(`${isEdit ? "Sửa" : "Thêm"} hoá chất thành công !!`);
+          setEditingItem(null);
+          getData(1);
+        }
+      } catch (error) {
+        message.error(error.message);
       }
     },
     [editingItem, getData]
@@ -86,15 +83,10 @@ const Chemistry = () => {
     try {
       await remove({ _id: removeId, isDeleted: true, role: role });
       setRemoveId(null);
-      notification.success({
-        message: "Remove chemistry successfully",
-      });
       message.success("Xoá hoá chất thành công !");
       getData(1);
     } catch (err) {
-      notification.error({
-        message: err.message,
-      });
+      message.error("Xoá thất bại");
     }
   }, [getData, removeId, role]);
 

@@ -45,7 +45,6 @@ const Import = () => {
 
       const res = await get(page, role || current, pageSize, search);
       setData(res?.data);
-      console.log(res?.data);
 
       // setPagination({
       //   ...pagination,
@@ -177,7 +176,6 @@ const Import = () => {
       key: "products",
       width: "20%",
       render: (_text, record) => {
-        console.log(record);
         return (
           Array.isArray(record.products) &&
           record.products.length > 0 &&

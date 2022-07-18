@@ -1,3 +1,3 @@
 import { axiosClient } from "./axiosClient";
 
-export const get = () => axiosClient.get("/root/home");
+export const get = () => axiosClient.get("/root/tracker");

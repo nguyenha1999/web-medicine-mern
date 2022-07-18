@@ -3,7 +3,17 @@ import moment from "moment";
 import { memo, useEffect, useRef } from "react";
 import "./index.css";
 
-export default memo(() => {
+export default memo((props) => {
+  let { data } = props;
+
+  console.log(data);
+  const newData = data.listChemExport.map((e) => {
+    return {
+      name: e._id,
+      y: (e.totalExportChemistryOfMounth / data.total[0].total) * 10,
+      drilldown: e._id,
+    };
+  });
   const refContainer = useRef();
   useEffect(() => {
     Highcharts.chart(refContainer.current, {
@@ -44,43 +54,7 @@ export default memo(() => {
         {
           name: "Chemistry",
           colorByPoint: true,
-          data: [
-            {
-              name: "Hydro Sulphua",
-              y: 62.74,
-              drilldown: "Hydro Sulphua",
-            },
-            {
-              name: "Axit Clohydric",
-              y: 10.57,
-              drilldown: "Axit Clohydric",
-            },
-            {
-              name: "Axit Sulphuric",
-              y: 7.23,
-              drilldown: "Axit Sulphuric",
-            },
-            {
-              name: "Nito",
-              y: 5.58,
-              drilldown: "Nito",
-            },
-            {
-              name: "Oxy",
-              y: 4.02,
-              drilldown: "Oxy",
-            },
-            {
-              name: "Clo",
-              y: 1.92,
-              drilldown: "Clo",
-            },
-            {
-              name: "Loại khác",
-              y: 7.62,
-              drilldown: null,
-            },
-          ],
+          data: newData,
         },
       ],
     });

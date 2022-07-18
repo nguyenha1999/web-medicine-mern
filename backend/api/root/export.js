@@ -1,5 +1,6 @@
 const Exports = require("../../model/export");
 const Chemistries = require("../../model/chemistry");
+const moment = require("moment");
 
 module.exports = {
   index: function (role) {
@@ -13,7 +14,20 @@ module.exports = {
     products.map(async (e) => {
       const countChemistry = await Chemistries.find({ _id: e._id });
       let newCount = countChemistry[0].count - e.count;
-      await Chemistries.findByIdAndUpdate(e._id, { count: newCount });
+      let updateCountExportOfMounth;
+      if (
+        moment().format("YYYY-MM-DD") !==
+        moment().clone().startOf("month").format("YYYY-MM-DD")
+      ) {
+        updateCountExportOfMounth =
+          countChemistry[0].countExportOfMounth + e.count;
+      } else {
+        updateCountExportOfMounth = 0;
+      }
+      await Chemistries.findByIdAndUpdate(e._id, {
+        count: newCount,
+        countExportOfMounth: updateCountExportOfMounth,
+      });
     });
 
     const price = products

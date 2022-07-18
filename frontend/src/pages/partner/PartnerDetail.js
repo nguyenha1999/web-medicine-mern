@@ -6,7 +6,6 @@ import ChemistrySelector from "./ChemistrySelector";
 const ExportDetail = ({ item, onOk, onCancel }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
-  console.log(item);
 
   const [chemistryOptions, setChemistryOptions] = useState([]);
   const getChemistrySelector = useCallback(async () => {
@@ -33,7 +32,6 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
   useEffect(() => {
     if (!item) return;
 
-    console.log(item);
     const itemData = {
       nameCompany: item.nameCompany,
       adress: item.address,
@@ -115,8 +113,6 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
 
   const isEdit = !!item?._id;
   const title = isEdit ? "Sửa Thông tin đối tác" : "Thêm đối tác";
-
-  console.log(data);
 
   return (
     <Modal

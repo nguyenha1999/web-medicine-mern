@@ -5,11 +5,28 @@ import { LinkVertical } from "@visx/shape";
 import { notification } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { create, getById, update } from "../../api/recipe";
+import { create, getById, remove, update } from "../../api/recipe";
 import EditNodeModal from "./EditNodeModal";
 import useForceUpdate from "./useForceUpdate";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
+
+function convertChem(chem) {
+  if (chem.children && Array.isArray(chem.children) && chem.children.length) {
+    let flatChildren = [];
+
+    for (let index = 0; index < chem.children.length; index++) {
+      let flattenChild = convertChem(chem.children[index].chemId);
+
+      flatChildren.push({ ratio: chem.children[index].ratio, ...flattenChild });
+    }
+    chem.children = flatChildren;
+
+    return chem;
+  } else {
+    return chem;
+  }
+}
 
 const RecipeGroup = ({
   width: totalWidth,
@@ -31,18 +48,17 @@ const RecipeGroup = ({
   const getData = useCallback(async () => {
     if (!id) return;
     const res = await getById(id);
-    setData(res.data);
+    const newResolve = convertChem(res.data);
+    setData(newResolve);
   }, [id]);
 
   useEffect(() => {
     getData();
-    // eslint-disable-next-line no-use-before-define
-  }, [getData, id]);
+  }, [getData]);
+
   const getChild = (parent, childId) => {
     return parent.children.find((item) => item._id === childId);
   };
-
-  console.log(data);
 
   const getParentFromRoot = () => {
     const parentIds = pathIds.slice(0, pathIds.length - 1);
@@ -74,7 +90,6 @@ const RecipeGroup = ({
 
       return ids;
     } catch (err) {
-      console.error(err);
       return [];
     }
   }, []);
@@ -96,7 +111,7 @@ const RecipeGroup = ({
         currentParent.children = null;
       }
 
-      await update(data);
+      await remove({ childId: itemId, parentId: currentParent._id });
 
       setEditingNode(null);
       forceUpdate();
@@ -159,8 +174,8 @@ const RecipeGroup = ({
 
       if (!data._id) {
         const res = await create(values);
-        const { _id } = res.data;
-        history.push(`/recipe/${productId}/${_id}`);
+        const { code } = res.data;
+        history.push(`/recipe/${code}`);
       } else {
         await update(values);
         await getData();
@@ -249,7 +264,7 @@ const RecipeGroup = ({
         <rect width={totalWidth} height={totalHeight} rx={14} fill="#272b4d" />
         <Group top={margin.top} left={margin.left}>
           <Tree
-            root={hierarchy(data, (d) => (d.isExpanded ? null : d.children))}
+            root={hierarchy(data, (d) => (d.isExpanded ? null : d?.children))}
             size={[innerWidth, innerHeight]}
             separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth}
           >
@@ -271,7 +286,6 @@ const RecipeGroup = ({
                   const centerY = -heightChil / 2;
                   const X = widthChil / 2 - 20;
                   const Y = heightChil / 2 + 4;
-
                   return (
                     <Group top={node.y} left={node.x} key={key}>
                       {node.depth === 0 && (
@@ -319,11 +333,19 @@ const RecipeGroup = ({
                             y={centerY}
                             x={centerX}
                             fill="#272b4d"
-                            stroke={node.data.children ? "#03c0dc" : "#26deb0"}
+                            stroke={
+                              node?.data?.children?.length > 0
+                                ? "#03c0dc"
+                                : "#26deb0"
+                            }
                             strokeWidth={1}
-                            strokeDasharray={node.data.children ? "0" : "2,2"}
-                            strokeOpacity={node.data.children ? 1 : 0.6}
-                            rx={node.data.children ? 0 : 10}
+                            strokeDasharray={
+                              node.data?.children?.length > 0 ? "0" : "2,2"
+                            }
+                            strokeOpacity={
+                              node.data?.children?.length > 0 ? 1 : 0.6
+                            }
+                            rx={node.data?.children?.length > 0 ? 0 : 10}
                             onClick={() => {
                               onToggleNode(node);
                               forceUpdate();

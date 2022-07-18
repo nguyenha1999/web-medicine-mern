@@ -15,6 +15,10 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+
+.ant-table-row-expand-icon {
+  display: none !important;
+}
 .table-row-light {
   background: #fff;
 }

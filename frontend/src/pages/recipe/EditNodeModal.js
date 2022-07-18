@@ -1,6 +1,18 @@
-import { Button, Card, Col, Input, Modal, notification, Row } from "antd";
-import { useEffect, useState } from "react";
-import { create } from "./../../api/recipe";
+import {
+  Button,
+  Card,
+  Col,
+  Input,
+  Modal,
+  notification,
+  Row,
+  Select,
+} from "antd";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
+import { get } from "../../api/chemistry";
+import { create } from "../../api/recipe";
 import ChildrenTable from "./ChildrenTable";
 import style from "./style";
 
@@ -14,11 +26,28 @@ const EditNodeModal = ({
 }) => {
   const [data, setData] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const codeRef = useRef();
+
+  let arr;
+  const getValue = useCallback(async () => {
+    arr = await get();
+  }, []);
+
+  const { register, setValue, watch } = useForm();
+
+  useEffect(() => {
+    getValue();
+  }, [getValue]);
   const [newChild, setNewChild] = useState({
     name: "",
     code: "",
     ratio: 0,
   });
+
+  const { Option } = Select;
+
+  const params = useParams();
+  const { id } = params;
 
   const changeData = (objectValue) => {
     setData({
@@ -34,42 +63,34 @@ const EditNodeModal = ({
     });
   };
 
-  console.log(dataRoot);
-  const onAddChild = () => {
-    // if (
-    //   !newChild ||
-    //   Object.values(newChild).some(
-    //     (value) => !value || (typeof value === "string" && !value.trim())
-    //   )
-    // )
-    //   return;
+  const onAddChild = async () => {
+    if (
+      !newChild ||
+      Object.values(newChild).some(
+        (value) => !value || (typeof value === "string" && !value.trim())
+      )
+    )
+      return;
 
     const newChildData = {
       ...newChild,
-      parentId: dataRoot._id,
-      depth: dataRoot.depth + 1,
     };
 
-    setData(newChild);
-    create(newChildData);
+    if (!data.code) {
+      data.code = id;
+    }
 
-    // if (data.children && data.children.length) {
-    //   setData({
-    //     ...data,
-    //     children: [...data.children, newChildData],
-    //   });
-    // } else {
-    //   setData({
-    //     ...data,
-    //     children: [newChildData],
-    //   });
-    // }
+    setData({
+      ...data,
+      child: newChildData,
+    });
 
-    // setNewChild({
-    //   name: "",
-    //   code: "",
-    //   ratio: 0,
-    // });
+    await create({ child: newChild, data });
+    setNewChild({
+      name: "",
+      code: "",
+      ratio: 0,
+    });
   };
 
   const isRoot = node && !node.depth;
@@ -77,20 +98,8 @@ const EditNodeModal = ({
   const onConfirm = async () => {
     setConfirmLoading(true);
     try {
-      if (!data) throw new Error("Invalid request");
-      if (!data.name || !data.name.trim()) throw new Error("Name is empty");
-      if (
-        data.children
-          .map((chil) => chil.ratio)
-          .reduce((curr, pre) => curr + pre) > 100
-      )
-        throw new Error("Tỉ lệ không được vượt quá 100% ");
-      if (!isRoot) {
-        if (!data.code || !data.code.trim()) throw new Error("Code is empty");
-        if (!data.ratio) throw new Error("Ratio must be greater than 0");
-      }
-
       const next = isRoot ? onOkRoot : onOk;
+
       await next(data);
     } catch (err) {
       notification.error({ message: err.message });
@@ -108,11 +117,21 @@ const EditNodeModal = ({
             onChange={(e) => changeNewChild({ name: e.target.value })}
             placeholder="Tên công thức"
           />
+          {/* <Select {...register("childname")}>
+            {Array.isArray(arr) &&
+              arr.length > 0 &&
+              arr.map((e) => {
+                codeRef.current = e.code;
+                return <Option value={e.code}>{e.name}</Option>;
+              })}
+          </Select> */}
         </Col>
         <Col span={8}>
           <h4>Mã Hoá Chất</h4>
           <Input
             value={newChild.code}
+            // {...register("childcode")}
+            // defaultValue={codeRef.current}
             onChange={(e) => changeNewChild({ code: e.target.value })}
             placeholder="Mã hoá chất"
           />
@@ -121,6 +140,7 @@ const EditNodeModal = ({
           <h4>Tỉ lệ</h4>
           <Input
             type="number"
+            {...register("childratio")}
             value={newChild.ratio || ""}
             onChange={(e) => changeNewChild({ ratio: Number(e.target.value) })}
             placeholder="Tỉ lệ"
@@ -193,12 +213,16 @@ const EditNodeModal = ({
             <h3>Tên hoá chất</h3>
             <Input
               value={data?.name || ""}
+              name="name"
+              {...register("name")}
               onChange={(e) => changeData({ name: e.target.value })}
             />
             {!isRoot && (
               <>
                 <h3>Mã hoá chất</h3>
                 <Input
+                  name="code"
+                  {...register("code")}
                   value={data?.code || ""}
                   onChange={(e) => changeData({ code: e.target.value })}
                 />
@@ -206,6 +230,8 @@ const EditNodeModal = ({
                 <h3>Tỉ lệ</h3>
                 <Input
                   type="number"
+                  name="ratio"
+                  {...register("ratio")}
                   value={data?.ratio || ""}
                   onChange={(e) =>
                     changeData({ ratio: Number(e.target.value) })

@@ -3,3 +3,17 @@ text.highcharts-title {
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
+.highcharts-container {
+  width: 100% !important;
+  display: "block";
+}
+
+.highcharts-root {
+  width: 100% !important;
+  display: "block";
+}
+
+#container {
+  width: 100% !important;
+}

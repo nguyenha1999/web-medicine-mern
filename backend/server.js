@@ -30,8 +30,6 @@ app.use(function (req, res, next) {
   }
 });
 
-console.log("Setup CORS successfully");
-
 setRoutes(app, "./api", true, "api");
 setRoutes(app, "./controllers", false);
 
