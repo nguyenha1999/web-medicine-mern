@@ -15,6 +15,5 @@ export const apiUpload = axios.create({
   headers: {
     Authorization: "Bearer" + token,
     "Content-Type": "multipart/form-data",
-    Accept: "multipart/form-data",
   },
 });

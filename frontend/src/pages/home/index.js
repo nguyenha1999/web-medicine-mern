@@ -33,21 +33,25 @@ const listDates = enumerateDaysBetweenDates(
   moment().add(1, "d")
 ).map((item) => moment(item).format("DD/MM/YYYY"));
 
-function getDataCurentMonth(data) {
-  console.log(data);
+function getDataCurentMonth(data, key) {
   const dataCurentMonthIndex = data.findIndex(
-    (item) => item.date == startOfMonthDmy
+    (item) => item.date === startOfMonthDmy
   );
-  if (dataCurentMonthIndex != -1) {
-    return data.slice(dataCurentMonthIndex).map((item) => item.count);
+  if (dataCurentMonthIndex !== -1) {
+    return data
+      .slice(dataCurentMonthIndex)
+      .map((item) => (item[key] ? item[key] : 0));
   }
   return [];
 }
 
+console.log();
 function fillDataChart(data) {
   return {
-    export: getDataCurentMonth(data.exportTrack),
-    import: getDataCurentMonth(data.importTrack),
+    export: getDataCurentMonth(data.exportTrack, "count"),
+    import: getDataCurentMonth(data.importTrack, "count"),
+    exportTotal: getDataCurentMonth(data.exportTrack, "totalPrice"),
+    importTotal: getDataCurentMonth(data.importTrack, "totalPrice"),
   };
 }
 

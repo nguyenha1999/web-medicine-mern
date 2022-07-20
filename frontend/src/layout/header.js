@@ -53,7 +53,12 @@ const HeaderComponent = (props) => {
       <Row width="100%">
         <Col span={8} style={{ textAlign: "left" }}>
           <MenuOutlined onClick={click} style={{ fontSize: "20px" }} />
-          <img src={logo} alt="logo" className="logo" />
+          <img
+            src={logo}
+            alt="logo"
+            className="logo"
+            onClick={() => history.push("/")}
+          />
         </Col>
         <Col span={8}>
           <h1>APP QUẢN LÝ NHÀ MÁY HOÁ CHẤT</h1>

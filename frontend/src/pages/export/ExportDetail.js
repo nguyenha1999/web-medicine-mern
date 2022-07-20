@@ -21,6 +21,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
       const res = await getSelectors();
       setChemistryOptions(res.data);
     } catch (err) {
+      console.log(err);
       notification.error({
         message: err.message,
       });
@@ -182,7 +183,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
           <h5>Lựa chọn Hoá Chất</h5>
           <ChemistrySelector
             options={chemistryOptions}
-            value={data.products.map((product) => product._id)}
+            value={data.products.map((product) => product.code)}
             onChange={onChangeSelector}
           />
         </Form.Item>

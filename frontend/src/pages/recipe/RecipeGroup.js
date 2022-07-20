@@ -12,7 +12,12 @@ import useForceUpdate from "./useForceUpdate";
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
 function convertChem(chem) {
-  if (chem.children && Array.isArray(chem.children) && chem.children.length) {
+  if (
+    chem.children &&
+    Array.isArray(chem.children) &&
+    chem.children.length &&
+    chem.code.length > 1
+  ) {
     let flatChildren = [];
 
     for (let index = 0; index < chem.children.length; index++) {
@@ -36,10 +41,11 @@ const RecipeGroup = ({
   const history = useHistory();
 
   const param = useParams();
-  const { id, productId } = param;
+  const { id } = param;
   const [editingNode, setEditingNode] = useState(null);
   const [data, setData] = useState({
     name: "Root name",
+    code: id,
     children: [],
   });
 
@@ -141,8 +147,6 @@ const RecipeGroup = ({
     return data;
   };
 
-  //submit data
-
   const onOk = async (values) => {
     try {
       const child = getChildFromRoot(pathIds);
@@ -162,8 +166,6 @@ const RecipeGroup = ({
       notification.error({ message: err.message });
     }
   };
-
-  //ok ở root
 
   const onOkRoot = async (values) => {
     try {
@@ -232,6 +234,7 @@ const RecipeGroup = ({
 
     // đóng mở nút con
     if (node.data.isExpanded) {
+      getData();
       openChildren(node);
     } else {
       // mở nút cháu

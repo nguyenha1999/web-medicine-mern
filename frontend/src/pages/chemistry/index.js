@@ -19,10 +19,6 @@ const Chemistry = () => {
   const setRecipe = useSetRecoilState(RecipeAtom);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 5,
-  });
 
   const [imageUrl, setImageUrl] = useState(null);
   const [removeId, setRemoveId] = useState(null);
@@ -37,12 +33,19 @@ const Chemistry = () => {
 
       const res = await get(page, role, search);
 
+      console.log(res?.data);
+
       setData(res?.data);
 
       setLoading(false);
     },
     [role, search, setData]
   );
+
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 5,
+  });
 
   const handleClone = useCallback(
     async (value) => {
@@ -232,8 +235,8 @@ const Chemistry = () => {
         <Col span={12} style={style.mb2}>
           <Search
             placeholder="Tìm kiếm"
-            onSearch={(value) => setSearch(value)}
-            onChange={(e) => getData(1, role, e.target.value)}
+            onSearch={(value) => setSearch(value.trim())}
+            onChange={(e) => getData(1, role, e.target.value.trim())}
             enterButton
           />
         </Col>

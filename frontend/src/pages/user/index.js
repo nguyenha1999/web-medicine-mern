@@ -78,9 +78,7 @@ const User = () => {
     try {
       await remove(removeId, role);
       setRemoveId(null);
-      notification.success({
-        message: "Xoá nhân viên thành công",
-      });
+      message.success("Xoá nhân viên thành công");
       getData(1);
     } catch (err) {
       notification.error({

@@ -6,14 +6,19 @@ import "./index.css";
 export default memo((props) => {
   let { data } = props;
 
-  console.log(data);
-  const newData = data.listChemExport.map((e) => {
-    return {
-      name: e._id,
-      y: (e.totalExportChemistryOfMounth / data.total[0].total) * 10,
-      drilldown: e._id,
-    };
-  });
+  const newData = data?.listChemExport
+    ?.map((e) => {
+      const ratio =
+        (e.totalExportChemistryOfMounth / data.total[0].total) * 100;
+      return {
+        name: e._id,
+        y: ratio,
+        drilldown: e._id,
+      };
+    })
+    .sort(function (a, b) {
+      return b.y - a.y;
+    });
   const refContainer = useRef();
   useEffect(() => {
     Highcharts.chart(refContainer.current, {

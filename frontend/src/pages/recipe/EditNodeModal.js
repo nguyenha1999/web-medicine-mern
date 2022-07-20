@@ -1,17 +1,7 @@
-import {
-  Button,
-  Card,
-  Col,
-  Input,
-  Modal,
-  notification,
-  Row,
-  Select,
-} from "antd";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Button, Card, Col, Input, Modal, notification, Row } from "antd";
+import { useEffect, useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { get } from "../../api/chemistry";
 import { create } from "../../api/recipe";
 import ChildrenTable from "./ChildrenTable";
 import style from "./style";
@@ -28,23 +18,19 @@ const EditNodeModal = ({
   const [confirmLoading, setConfirmLoading] = useState(false);
   const codeRef = useRef();
 
-  let arr;
-  const getValue = useCallback(async () => {
-    arr = await get();
-  }, []);
+  const { register, setValue, control } = useForm();
 
-  const { register, setValue, watch } = useForm();
-
-  useEffect(() => {
-    getValue();
-  }, [getValue]);
   const [newChild, setNewChild] = useState({
     name: "",
     code: "",
     ratio: 0,
   });
 
-  const { Option } = Select;
+  const childName = useWatch({
+    name: "childname",
+    control,
+    defaultValue: undefined,
+  });
 
   const params = useParams();
   const { id } = params;
@@ -84,7 +70,6 @@ const EditNodeModal = ({
       ...data,
       child: newChildData,
     });
-
     await create({ child: newChild, data });
     setNewChild({
       name: "",
@@ -95,13 +80,15 @@ const EditNodeModal = ({
 
   const isRoot = node && !node.depth;
 
+  const disabled = node && node.data.code.length === 1;
+
   const onConfirm = async () => {
     setConfirmLoading(true);
     try {
       const next = isRoot ? onOkRoot : onOk;
-
       await next(data);
     } catch (err) {
+      console.log("e");
       notification.error({ message: err.message });
     }
     setConfirmLoading(false);
@@ -114,24 +101,15 @@ const EditNodeModal = ({
           <h4>Tên Hoá Chất</h4>
           <Input
             value={newChild.name}
+            {...register("childname")}
             onChange={(e) => changeNewChild({ name: e.target.value })}
             placeholder="Tên công thức"
           />
-          {/* <Select {...register("childname")}>
-            {Array.isArray(arr) &&
-              arr.length > 0 &&
-              arr.map((e) => {
-                codeRef.current = e.code;
-                return <Option value={e.code}>{e.name}</Option>;
-              })}
-          </Select> */}
         </Col>
         <Col span={8}>
           <h4>Mã Hoá Chất</h4>
           <Input
             value={newChild.code}
-            // {...register("childcode")}
-            // defaultValue={codeRef.current}
             onChange={(e) => changeNewChild({ code: e.target.value })}
             placeholder="Mã hoá chất"
           />
@@ -242,7 +220,7 @@ const EditNodeModal = ({
           </div>
         </Card>
 
-        <Card title="Children list">
+        <Card title="Children list" hidden={disabled}>
           {!data.children || !data.children.length ? (
             renderAddChild()
           ) : (

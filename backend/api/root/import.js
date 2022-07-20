@@ -1,5 +1,6 @@
 const Imports = require("../../model/import");
 const Chemistries = require("../../model/chemistry");
+const Tracks = require("../../model/tracking");
 
 module.exports = {
   index: function (role) {
@@ -9,7 +10,7 @@ module.exports = {
     return Imports.find({ isDeleted: false });
   },
 
-  post_index: function (isExport, createdAt, products, staff) {
+  post_index: async function (isExport, createdAt, products, staff) {
     products.map(async (e) => {
       const countChemistry = await Chemistries.find({ _id: e._id });
       let newCount = countChemistry[0].count + e.count;
@@ -20,7 +21,19 @@ module.exports = {
       .map((product) => product.count * product.price)
       .reduce((curr, pre) => curr + pre);
 
-    return Imports.create({
+    const isExitTracks = (await Tracks.exists({ createdAt })) ?? {};
+    if (isExitTracks) {
+      const track = await Tracks.findOne({ createdAt });
+      let newTrackValue = Tracks.totalImport + price;
+      await Tracks.findByIdAndUpdate(track._id, { totalImport: newTrackValue });
+    } else {
+      await Tracks.create({
+        createdAt: createdAt,
+        totalImport: price,
+        totalExport: 0,
+      });
+    }
+    return await Imports.create({
       isExport: isExport,
       createdAt: createdAt,
       products: products,
