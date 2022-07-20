@@ -19,6 +19,7 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
   const getChemistrySelector = useCallback(async () => {
     try {
       const res = await getSelectors();
+      console.log(res);
       setChemistryOptions(res.data);
     } catch (err) {
       notification.error({
@@ -26,6 +27,10 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    getChemistrySelector();
+  }, [getChemistrySelector]);
 
   const [data, setData] = useState({
     createdAt: new Date().getTime(),
@@ -68,6 +73,7 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
         _id: product._id,
         name: product.name,
         count: 1,
+        code: product.code,
         price: product.price,
       }));
 
@@ -107,10 +113,6 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
     });
   };
 
-  useEffect(() => {
-    getChemistrySelector();
-  }, [getChemistrySelector]);
-
   const onFinish = useCallback(async () => {
     setConfirmLoading(true);
     try {
@@ -133,6 +135,7 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
           return {
             _id: product._id,
             count: product.count,
+            code: product.code,
             name: product.name,
             price: product.price,
           };

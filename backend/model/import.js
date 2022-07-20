@@ -19,6 +19,7 @@ const ImportSchema = new mongoose.Schema({
       name: String,
       count: Number,
       price: Number,
+      code: String,
       product: { type: mongoose.SchemaTypes.ObjectId, ref: "Chemistries" },
     },
   ],

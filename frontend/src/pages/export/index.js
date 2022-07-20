@@ -64,9 +64,7 @@ const Export = () => {
         );
         getData(1);
       } catch (err) {
-        message.error({
-          message: err.message,
-        });
+        message.error(err.message);
       }
     },
     [editingItem, getData]

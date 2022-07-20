@@ -4,7 +4,7 @@ import {
   EditOutlined,
   FilePdfOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Input, notification, Row, Table } from "antd";
+import { Button, Col, Input, message, notification, Row, Table } from "antd";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
@@ -30,7 +30,6 @@ const Import = () => {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
-    // total: 200,
   });
 
   const [removeId, setRemoveId] = useState(null);
@@ -46,10 +45,6 @@ const Import = () => {
       const res = await get(page, role || current, pageSize, search);
       setData(res?.data);
 
-      // setPagination({
-      //   ...pagination,
-      //   total: res?.data?.total || 0,
-      // });
       setLoading(false);
     },
     [pagination, role, search, setData]
@@ -64,9 +59,9 @@ const Import = () => {
       try {
         await next(values);
         setEditingItem(null);
-        notification.success({
-          message: `${isEdit ? "Update" : "Create"} chemistry successfully`,
-        });
+        message.success(
+          `${isEdit ? "Cập nhật" : "Thêm"} hoá đơn nhập thành công`
+        );
         getData(1);
       } catch (err) {
         notification.error({
@@ -192,16 +187,6 @@ const Import = () => {
       key: "totalPrice",
       dataIndex: "totalPrice",
       width: "15%",
-      // render: (_text, record) => {
-      //   console.log(record);
-      //   return (
-      //     Array.isArray(record.products) &&
-      //     record.products.length > 0 &&
-      //     record.products
-      //       .map((product) => product.count * product.price)
-      //       .reduce((curr, pre) => curr + pre)
-      //   );
-      // },
     },
     {
       title: "Nhân viên",

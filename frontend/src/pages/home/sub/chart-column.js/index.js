@@ -7,7 +7,6 @@ const currentDate = moment().format("HH:mm ngà\\y DD t\\háng MM nă\\m YYYY");
 
 export default memo((props) => {
   let { categories, data } = props;
-  console.log(categories);
   const refContainer = useRef();
   useEffect(() => {
     Highcharts.chart(refContainer.current, {
@@ -62,17 +61,11 @@ export default memo((props) => {
         },
         {
           name: "Tổng thu",
-          data: [
-            48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3,
-            51.2, 49.9, 71.5, 106.4, 129.2, 144.0, 176.0,
-          ],
+          data: data.exportTotal,
         },
         {
-          name: "Lợi Nhuận",
-          data: [
-            42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8,
-            51.1, 49.9, 71.5, 106.4, 129.2, 144.0, 176.0,
-          ],
+          name: "Tổng chi",
+          data: data.importTotal,
         },
       ],
     });

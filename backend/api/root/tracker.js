@@ -1,5 +1,6 @@
 const Imports = require("../../model/import");
 const Exports = require("../../model/export");
+const Trackers = require("../../model/tracking");
 const moment = require("moment");
 const MomentRange = require("moment-range");
 const _ = require("lodash");
@@ -25,11 +26,7 @@ module.exports = {
       return data2MonthAgo;
     }
 
-    async function groupDataFor2MonthAgo(
-      model,
-
-      groupField
-    ) {
+    async function groupDataFor2MonthAgo(model, groupField) {
       return await model.aggregate([
         {
           $match: {
@@ -47,6 +44,12 @@ module.exports = {
             totalPrice: {
               $sum: "$totalPrice",
             },
+            totalE: {
+              $sum: "$totalExport",
+            },
+            totalI: {
+              $sum: "$totalImport",
+            },
           },
         },
         {
@@ -55,6 +58,8 @@ module.exports = {
             date: "$_id",
             count: "$count",
             totalPrice: "$totalPrice",
+            totalE: "$totalE",
+            totalI: "$totalI",
           },
         },
       ]);
@@ -66,7 +71,6 @@ module.exports = {
           _id: {
             year: { $year: "$createdAt" },
             month: { $month: "$createdAt" },
-            day: { $dayOfMonth: "$createdAt" },
           },
 
           totalImported: {
@@ -85,7 +89,6 @@ module.exports = {
           _id: {
             year: { $year: "$createdAt" },
             month: { $month: "$createdAt" },
-            day: { $dayOfMonth: "$createdAt" },
           },
 
           totalExported: {
@@ -105,6 +108,7 @@ module.exports = {
 
     const importStatistics = await groupDataFor2MonthAgo(Imports, "createdAt");
     const exportStatistics = await groupDataFor2MonthAgo(Exports, "createdAt");
+    const trackerI = await groupDataFor2MonthAgo(Trackers, "createdAt");
 
     const importTrack = _.sortBy(
       _.unionBy([...importStatistics, ...data2MonthAgo], "date"),
@@ -115,20 +119,20 @@ module.exports = {
       "date"
     );
 
+    const trackerIm = _.sortBy(
+      _.unionBy([...trackerI, ...data2MonthAgo], "date"),
+      "date"
+    );
     const listChemExport = await Chemistry.aggregate([
       {
         $group: {
           _id: "$code",
-          //   code: "$code",
-          //   name: "$name",
           totalExportChemistryOfMounth: { $sum: "$countExportOfMounth" },
         },
       },
       {
         $project: {
           _id: "$_id",
-          //   code: "$code",
-          //   name: "$name",
           totalExportChemistryOfMounth: "$totalExportChemistryOfMounth",
         },
       },
@@ -157,6 +161,7 @@ module.exports = {
       exportTrack,
       listChemExport,
       total,
+      trackerIm,
     };
   },
 };

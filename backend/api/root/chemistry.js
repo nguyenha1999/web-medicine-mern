@@ -1,31 +1,32 @@
 const ServerError = require("../../utils/serverError");
 const Chemistries = require("../../model/chemistry");
-const Recipe = require("../../model/chem");
 
 module.exports = {
-  index: function (role) {
+  index: async function (role, search) {
+    if (search) {
+      const a = await Chemistries.find({
+        $or: [{ code: search }, { name: search }],
+      });
+      return a;
+    }
     if (role === "admin") {
-      return Chemistries.find();
+      return await Chemistries.find({}).sort({ createdAt: -1 });
     }
 
-    return Chemistries.find();
+    if (!role && !search) {
+      return await Chemistries.find({});
+    }
+    return await Chemistries.find({ isDeleted: true }).sort({ createdAt: -1 });
   },
 
-  post_index: async function (name, code, use, price) {
-    Recipe.create({
-      name: name,
-      code: code,
-      price: price,
-      isDeleted: false,
-      use: use,
-      children: [],
-    });
-
+  post_index: async function (name, code, use, price, image) {
     const isExit = await Chemistries.exists({ code });
 
-    if (isExit) {
-      return { error: true, message: "Hoá chất đã tồn tại" };
-    }
+    console.log(image);
+
+    // if (isExit) {
+    //   return { error: true, message: "Hoá chất đã tồn tại" };
+    // }
 
     return await Chemistries.create({
       name: name,
@@ -51,13 +52,13 @@ module.exports = {
       return new ServerError(400, "Mã hoá chất đã tồn tại");
     }
   },
-  post_clone: function (_id, name, code, use, price) {
-    let numberOfProcedure = Chemistries.countDocuments({ name: name });
+  post_clone: async function (_id, name, code, use, price) {
+    let numberOfProcedure = await Chemistries.countDocuments({ name: name });
 
-    const newName = `[Clone]_${name}`;
-    const newCode = `[Clone]_${code}`;
+    const newName = `${name}_${numberOfProcedure}`;
+    const newCode = `${code}_${numberOfProcedure}`;
 
-    return Chemistries.create({
+    return await Chemistries.create({
       name: newName,
       code: newCode,
       use: use,

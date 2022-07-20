@@ -1,4 +1,4 @@
-const Recipe = require("../../model/chem");
+const Recipe = require("../../model/chemistry");
 
 module.exports = {
   index: async function (code) {
@@ -36,23 +36,29 @@ module.exports = {
   post_index: async function (data, child) {
     const parent = await Recipe.findOne({ code: data.code });
     const chil = await Recipe.findOne({ code: child.code });
-    let arr = { chemId: chil._id, ratio: child.ratio };
-    if (parent?.children) {
-      parent?.children.push(arr);
+    if (chil) {
+      let arr = { chemId: chil?._id, ratio: child?.ratio };
+      if (parent?.children) {
+        parent?.children.push(arr);
+      } else {
+        parent.children = [];
+        parent?.children.push(arr);
+      }
     } else {
-      parent.children = [];
-      parent?.children.push(arr);
+      return await {
+        error: true,
+        status: 400,
+        message: "Không tìm thấy hoá chất trong danh mục!",
+      };
     }
     return await Recipe.findByIdAndUpdate(parent._id, {
       children: parent?.children,
     });
   },
-  put_index: async function (code, name, ratio) {
+  put_index: async function (code, data, children) {
     const parent = await Recipe.findOne({ code: code });
     return await Recipe.findByIdAndUpdate(parent._id, {
-      code,
-      name,
-      ratio,
+      name: data.name,
     });
   },
   delete_index: async function (childId, parentId) {
