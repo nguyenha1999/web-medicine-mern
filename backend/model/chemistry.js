@@ -11,6 +11,8 @@ const ChemistrySchema = new mongoose.Schema({
   price: Number,
   isDeleted: Boolean,
   count: Number,
+  unit: String,
+  state: String,
   use: String,
   nameCompany: String,
   countExportOfMounth: Number,

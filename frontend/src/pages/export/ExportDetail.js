@@ -1,4 +1,4 @@
-import { Col, DatePicker, Form, Input, Modal, notification, Row } from "antd";
+import { Col, DatePicker, Form, Input, message, Modal, Row } from "antd";
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -21,10 +21,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
       const res = await getSelectors();
       setChemistryOptions(res.data);
     } catch (err) {
-      console.log(err);
-      notification.error({
-        message: err.message,
-      });
+      message.error("Lấy danh sách hoá chất thất bại!");
     }
   }, []);
 
@@ -139,7 +136,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
 
       await onOk(result);
     } catch (err) {
-      notification.error({ message: err.message });
+      message.error(err.message);
     }
     setConfirmLoading(false);
   }, [data, username, code, onOk]);
@@ -183,7 +180,9 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
           <h5>Lựa chọn Hoá Chất</h5>
           <ChemistrySelector
             options={chemistryOptions}
-            value={data.products.map((product) => product.code)}
+            value={data.products.map((product) => {
+              return product._id;
+            })}
             onChange={onChangeSelector}
           />
         </Form.Item>

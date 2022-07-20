@@ -6,7 +6,7 @@ module.exports = {
     if (search) {
       const a = await Chemistries.find({
         $or: [{ code: search }, { name: search }],
-      });
+      }).sort({ createdAt: -1 });
       return a;
     }
     if (role === "admin") {
@@ -16,21 +16,21 @@ module.exports = {
     if (!role && !search) {
       return await Chemistries.find({});
     }
-    return await Chemistries.find({ isDeleted: true }).sort({ createdAt: -1 });
+    return await Chemistries.find({ isDeleted: false }).sort({ createdAt: -1 });
   },
 
-  post_index: async function (name, code, use, price, image) {
+  post_index: async function (name, code, use, price, image, unit, state) {
     const isExit = await Chemistries.exists({ code });
 
-    console.log(image);
-
-    // if (isExit) {
-    //   return { error: true, message: "Hoá chất đã tồn tại" };
-    // }
+    if (isExit) {
+      return { error: true, message: "Hoá chất đã tồn tại" };
+    }
 
     return await Chemistries.create({
       name: name,
       code: code,
+      unit: unit,
+      state: state,
       countExportOfMounth: 0,
       use: use,
       price: price,
@@ -52,7 +52,7 @@ module.exports = {
       return new ServerError(400, "Mã hoá chất đã tồn tại");
     }
   },
-  post_clone: async function (_id, name, code, use, price) {
+  post_clone: async function (_id, name, code, use, price, unit, state) {
     let numberOfProcedure = await Chemistries.countDocuments({ name: name });
 
     const newName = `${name}_${numberOfProcedure}`;
@@ -60,6 +60,8 @@ module.exports = {
 
     return await Chemistries.create({
       name: newName,
+      unit: unit,
+      state: state,
       code: newCode,
       use: use,
       price: price,
@@ -67,12 +69,14 @@ module.exports = {
       isDeleted: false,
     });
   },
-  put_index: function (_id, name, code, price, use) {
+  put_index: function (_id, name, code, price, use, unit, state) {
     return Chemistries.findByIdAndUpdate(_id, {
       use,
       name,
       code,
       price,
+      state,
+      unit,
     });
   },
   delete_index: function (id, role) {

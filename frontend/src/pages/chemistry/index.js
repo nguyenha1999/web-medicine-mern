@@ -33,8 +33,6 @@ const Chemistry = () => {
 
       const res = await get(page, role, search);
 
-      console.log(res?.data);
-
       setData(res?.data);
 
       setLoading(false);
@@ -67,7 +65,7 @@ const Chemistry = () => {
 
       try {
         const resolve = await next(values);
-        if (resolve.data.error) {
+        if (resolve?.data?.error) {
           throw new Error(resolve.data.message);
         } else {
           message.success(`${isEdit ? "Sửa" : "Thêm"} hoá chất thành công !!`);
@@ -111,28 +109,16 @@ const Chemistry = () => {
       key: "name",
     },
     {
-      title: "Nhà cung cấp chính",
-      dataIndex: "partner",
-      key: "partner",
-    },
-    {
-      title: "Số lượng trong kho",
-      dataIndex: "count",
-      key: "count",
-    },
-    {
-      title: "Thông tin hoá chất",
-      key: "image",
+      title: "Trạng thái",
+      key: "state",
       width: "15%",
-      render: (_text, record) => (
-        <Button
-          type="link"
-          size="small"
-          onClick={() => setImageUrl(record.imageUrl)}
-        >
-          Ảnh hoá chất
-        </Button>
-      ),
+      dataIndex: "state",
+    },
+    {
+      title: "Đơn vị",
+      key: "unit",
+      width: "10%",
+      dataIndex: "unit",
     },
     {
       title: "Công thức",

@@ -1,4 +1,5 @@
 import { Form, Input, message, Modal } from "antd";
+import { sha256 } from "js-sha256";
 import { useCallback, useEffect, useState } from "react";
 import BranchSelector from "./BranchSelector";
 import RoleSelector from "./RoleSelector";
@@ -19,6 +20,7 @@ const UserDetail = ({ item, onOk, onCancel }) => {
       code: item.code,
       value: item.value,
       branch: item.branch,
+      role: item.role,
     });
   }, [form, item]);
 
@@ -30,10 +32,10 @@ const UserDetail = ({ item, onOk, onCancel }) => {
         if (!!item?._id) {
           data._id = item._id;
         }
+        data.password = sha256(data.password);
         await onOk(data);
-        // reset();
       } catch (err) {
-        message.error("Cos lox xay ra");
+        message.error("Có lỗi xảy ra");
       }
       setConfirmLoading(false);
     },
@@ -55,7 +57,17 @@ const UserDetail = ({ item, onOk, onCancel }) => {
       }}
       confirmLoading={confirmLoading}
     >
-      <Form form={form} name="control-hooks" onFinish={onFinish}>
+      <Form
+        form={form}
+        name="control-hooks"
+        onFinish={onFinish}
+        labelCol={{
+          span: 6,
+        }}
+        wrapperCol={{
+          span: 16,
+        }}
+      >
         <Form.Item
           label="Tên Nhân Viên"
           name="username"
@@ -94,7 +106,7 @@ const UserDetail = ({ item, onOk, onCancel }) => {
             },
           ]}
         >
-          <Input style={{ width: "360px", marginLeft: "54px" }} />
+          <Input />
         </Form.Item>
         <Form.Item
           label="Mật khẩu"
@@ -110,10 +122,7 @@ const UserDetail = ({ item, onOk, onCancel }) => {
             },
           ]}
         >
-          <Input.Password
-            placeholder="******"
-            style={{ width: "360px", marginLeft: "29px" }}
-          />
+          <Input.Password placeholder="******" />
         </Form.Item>
         <Form.Item
           label="Chức Vụ"
@@ -140,12 +149,12 @@ const UserDetail = ({ item, onOk, onCancel }) => {
           <BranchSelector />
         </Form.Item>
         <Form.Item
-          label="Quyền trên hệ thống"
+          label="Phân quyền"
           name="role"
           rules={[
             {
               required: true,
-              message: "Vui lòng nhập tên bộ phận làm việc!!",
+              message: "Vui lòng nhập quyền trên hệ thống!!",
             },
           ]}
         >

@@ -1,14 +1,5 @@
 import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
-import {
-  Avatar,
-  Button,
-  Col,
-  Input,
-  message,
-  notification,
-  Row,
-  Table,
-} from "antd";
+import { Avatar, Button, Col, Input, message, Row, Table } from "antd";
 import "jspdf-autotable";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -41,14 +32,12 @@ const User = () => {
     async (page) => {
       setLoading(true);
 
-      // get data
-      const { current, pageSize } = pagination;
-      const res = await get(page, role || current, pageSize, search);
+      const res = await get(page, role, search);
       setData(res?.data || []);
 
       setLoading(false);
     },
-    [pagination, role, search, setData]
+    [role, search, setData]
   );
 
   const updateData = useCallback(
@@ -63,8 +52,8 @@ const User = () => {
           throw new Error(resolve.data.message);
         } else {
           message.success(`${isEdit ? "Sửa" : "Thêm"} nhân viên thành công !!`);
-          setEditingItem(null);
           getData(1);
+          setEditingItem(null);
         }
       } catch (error) {
         message.error(error.message);
@@ -81,9 +70,7 @@ const User = () => {
       message.success("Xoá nhân viên thành công");
       getData(1);
     } catch (err) {
-      notification.error({
-        message: err.message,
-      });
+      message.error(err.message);
     }
   }, [getData, removeId, role]);
 
@@ -209,7 +196,8 @@ const User = () => {
         <Col span={12}>
           <Search
             placeholder="Search"
-            onSearch={(value) => setSearch(value)}
+            onSearch={(value) => setSearch(value.trim())}
+            onChange={(e) => getData(1, role, e.target.value.trim())}
             enterButton
           />
         </Col>
@@ -226,8 +214,6 @@ const User = () => {
             loading={loading}
             pagination={pagination}
             onChange={onTableChange}
-            rowClassName={(record) => record.activated && "table-hidden"}
-            // rowClassName={(record) => !record.enabled && "disabled-row"}
           />
         </Col>
       </Row>

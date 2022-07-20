@@ -3,11 +3,18 @@ const Chemistries = require("../../model/chemistry");
 const Tracks = require("../../model/tracking");
 
 module.exports = {
-  index: function (role) {
-    if (role === "admin") {
-      return Imports.find();
+  index: async function (role, search) {
+    if (search) {
+      const searchValue = await Imports.find({
+        $or: [{ code: search }, { "staffs.username": search }],
+      }).sort({ createdAt: -1 });
+      return searchValue;
     }
-    return Imports.find({ isDeleted: false });
+    if (role === "admin") {
+      return await Imports.find().sort({ createdAt: -1 });
+    }
+
+    return await Imports.find({ isDeleted: false }).sort({ createdAt: -1 });
   },
 
   post_index: async function (isExport, createdAt, products, staff) {
@@ -44,7 +51,18 @@ module.exports = {
     });
   },
 
-  put_index: function () {},
+  put_index: async function (createdAt, _id, products, staff) {
+    const price = products
+      .map((product) => product.count * product.price)
+      .reduce((curr, pre) => curr + pre);
+
+    return await Imports.findByIdAndUpdate(_id, {
+      createdAt,
+      products,
+      staff,
+      price: price,
+    });
+  },
 
   delete_index: function (id, role) {
     if (role === "admin") {

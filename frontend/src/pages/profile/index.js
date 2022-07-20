@@ -1,5 +1,6 @@
 import { Button, Card, Form, Input, message } from "antd";
 import Avatar from "antd/lib/avatar/avatar";
+import { sha256 } from "js-sha256";
 import { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
@@ -23,6 +24,7 @@ const Profile = () => {
 
   const submit = async (values) => {
     try {
+      values.password = sha256(values.password);
       await updateProfile({ ...values, _id: user?._id });
       message.success(`Chỉnh sửa thông tin ${user?.username} thành công !!!`);
     } catch (err) {

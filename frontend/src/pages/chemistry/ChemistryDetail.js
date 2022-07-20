@@ -1,11 +1,11 @@
-import { Form, Input, Modal, notification } from "antd";
+import { Form, Input, message, Modal } from "antd";
 import { memo, useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { uploadFile } from "../../api/chemistry";
 
 // import TextArea from "../../component/TextArea";
 import { formConfig } from "./formConfig";
-import ImagePreview from "./ImagePreview";
+import StateSelector from "./selector/stateSelector";
+import UnitSelector from "./selector/unitSelector";
 
 const IMAGE_ID = "imagepreview";
 
@@ -15,7 +15,6 @@ export default memo(({ item, onOk, onCancel }, ref) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const method = useForm();
   const [file, setFile] = useState(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [form] = Form.useForm();
 
   const isEdit = !!item?._id;
@@ -29,12 +28,13 @@ export default memo(({ item, onOk, onCancel }, ref) => {
       use: item.use,
       code: item.code,
       price: item.price,
+      unit: item.unit,
+      state: item.state,
     });
   }, [form, item]);
 
   const resetImage = () => {
     setFile(null);
-    setImagePreviewUrl("");
     const input = document.getElementById(IMAGE_ID);
     input && (input.value = "");
   };
@@ -48,18 +48,13 @@ export default memo(({ item, onOk, onCancel }, ref) => {
           data._id = item._id;
         }
 
-        let formData = new FormData();
-        formData.append("image", file);
-        console.log("formData", formData);
-        const res = await uploadFile(formData);
-        data.imageUrl = res;
         await onOk(data);
       } catch (error) {
-        notification.error({ message: error.message });
+        message.error(error.message);
       }
       setConfirmLoading(false);
     },
-    [file, item, onOk]
+    [item, onOk]
   );
 
   const renderInput = (key) => {
@@ -123,18 +118,40 @@ export default memo(({ item, onOk, onCancel }, ref) => {
         }}
         confirmLoading={confirmLoading}
       >
-        <Form form={form} name="control-hooks" onFinish={onFinish}>
+        <Form
+          form={form}
+          name="control-hooks"
+          onFinish={onFinish}
+          labelCol={{
+            span: 6,
+          }}
+          wrapperCol={{
+            span: 16,
+          }}
+        >
           {Object.entries(formConfig)?.map(([key, value]) =>
             render(key, value)
           )}
-          <ImagePreview
-            imageId={IMAGE_ID}
-            imageUrl={item?.imageUrl}
-            imagePreviewUrl={imagePreviewUrl}
-            setImagePreviewUrl={setImagePreviewUrl}
-            setFile={setFile}
-            maxHeight="70vh"
-          />
+          <Form.Item
+            label="Đơn vị"
+            name="unit"
+            wrapperCol={{
+              offset: 0,
+              span: 24,
+            }}
+          >
+            <UnitSelector />
+          </Form.Item>
+          <Form.Item
+            label="Trạng thái"
+            name="state"
+            wrapperCol={{
+              offset: 0,
+              span: 24,
+            }}
+          >
+            <StateSelector />
+          </Form.Item>
         </Form>
       </Modal>
     </FormProvider>

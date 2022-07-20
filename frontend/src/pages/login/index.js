@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Button, Card, Checkbox, Col, Form, Input, message, Row } from "antd";
+import { sha256 } from "js-sha256";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
@@ -24,6 +25,7 @@ const Login = () => {
 
   const submit = async (valueForm) => {
     try {
+      valueForm.password = sha256(valueForm.password);
       const datas = { ...valueForm };
       const res = await login(datas);
       const { data } = res;
@@ -36,7 +38,7 @@ const Login = () => {
         message.success(`chào mừng bạn ${data?.user?.username}`);
       }
     } catch (error) {
-      message.error("Looxi");
+      message.error("Tên đăng nhập hoặc mật khẩu không đúng!!");
     }
   };
 

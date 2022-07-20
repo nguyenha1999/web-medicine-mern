@@ -2,17 +2,34 @@ const Parners = require("../../model/partners");
 const moment = require("moment");
 
 module.exports = {
-  index: function (role) {
-    if (role === "admin") {
-      return Parners.find();
+  index: async function (role, search) {
+    if (search) {
+      let searchValue;
+      if (typeof search === "string") {
+        searchValue = await Parners.find({
+          $or: [{ code: search }, { nameCompany: search }, { address: search }],
+        });
+      } else if (typeof search === "number") {
+        searchValue = await Parners.find({
+          $or: [
+            { code: search },
+            { nameCompany: search },
+            { address: search },
+            { hotline: search },
+          ],
+        });
+      }
+      return searchValue;
     }
-    return Parners.find({ isDeleted: false });
-    // .skip((page - 1) * limit)
-    // .limit(limit);
+    if (role === "admin") {
+      return await Parners.find().sort({ createdAt: -1 });
+    }
+
+    return await Parners.find({ isDeleted: false }).sort({ createdAt: -1 });
   },
   post_index: function (address, hotline, nameCompany, products) {
     return Parners.create({
-      code: `P_${moment().format("DD/MM/YYYY")}`,
+      code: `P_${new Date().getMilliseconds()}`,
       address: address,
       hotline: hotline,
       nameCompany: nameCompany,

@@ -1,4 +1,4 @@
-import { Col, DatePicker, Form, Input, Modal, notification, Row } from "antd";
+import { Col, DatePicker, Form, Input, message, Modal, Row } from "antd";
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -19,12 +19,10 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
   const getChemistrySelector = useCallback(async () => {
     try {
       const res = await getSelectors();
-      console.log(res);
+
       setChemistryOptions(res.data);
     } catch (err) {
-      notification.error({
-        message: err.message,
-      });
+      message.error(err.message);
     }
   }, []);
 
@@ -144,7 +142,7 @@ const ImportDetail = ({ item, onOk, onCancel }) => {
 
       await onOk(result);
     } catch (err) {
-      notification.error({ message: err.message });
+      message.error(err.message);
     }
     setConfirmLoading(false);
   }, [code, data, onOk, username]);

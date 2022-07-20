@@ -17,7 +17,10 @@ module.exports = {
                 path: "children.chemId",
                 populate: {
                   path: "children.chemId",
-                  populate: "children.chemId",
+                  populate: {
+                    path: "children.chemId",
+                    populate: "children.chemId",
+                  },
                 },
               },
             },
@@ -44,6 +47,12 @@ module.exports = {
         parent.children = [];
         parent?.children.push(arr);
       }
+    } else if (data.code === child.code) {
+      return await {
+        error: true,
+        status: 400,
+        message: "Một hoá chất không được phép là con của chính nó!",
+      };
     } else {
       return await {
         error: true,
@@ -55,15 +64,33 @@ module.exports = {
       children: parent?.children,
     });
   },
-  put_index: async function (code, data, children) {
-    const parent = await Recipe.findOne({ code: code });
-    return await Recipe.findByIdAndUpdate(parent._id, {
-      name: data.name,
-    });
+  put_index: async function (_id, name, data, code, ratio) {
+    if (_id) {
+      return await Recipe.findByIdAndUpdate(_id, {
+        name: name,
+      });
+    }
+    if (data) {
+      const i = data.children.findIndex((e) => e.code === code);
+      if (i !== -1) {
+        const idSubChem = data.children[i]._id;
+        const parentChemIsDb = await Recipe.findOne({ _id: data._id });
+        const index = parentChemIsDb.children.findIndex(
+          (e) => e.chemId == idSubChem
+        );
+        parentChemIsDb.children[index].ratio = ratio;
+        newChild = [...parentChemIsDb.children];
+        const a = await Recipe.findByIdAndUpdate(data._id, {
+          children: newChild,
+        });
+      }
+    }
+
+    const chem = await Recipe.findOne({ code });
+    return await Recipe.findByIdAndUpdate(chem._id, { name: name });
   },
   delete_index: async function (childId, parentId) {
     const parent = await Recipe.find({ _id: parentId });
-    console.log(parent.children);
     const arr = parent?.children?.filter((e) => e.chemId !== childId);
     return await Recipe.findByIdAndUpdate(parentId, {
       children: parent.children,

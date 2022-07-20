@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Col, Input, notification, Row, Table } from "antd";
+import { Button, Col, Input, message, Row, Table } from "antd";
 import "jspdf-autotable";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -32,17 +32,13 @@ const Partner = () => {
       setLoading(true);
 
       // get data
-      const { current, pageSize } = pagination;
-      const res = await get(page, role || current, pageSize, search);
+
+      const res = await get(page, role, search);
       setData(res?.data || []);
-      // setPagination({
-      //   ...pagination,
-      //   total: res?.data?.total || 0,
-      // });
 
       setLoading(false);
     },
-    [pagination, role, search, setData]
+    [role, search, setData]
   );
 
   const updateData = useCallback(
@@ -54,14 +50,12 @@ const Partner = () => {
       try {
         await next(values);
         setEditingItem(null);
-        notification.success({
-          message: `${isEdit ? "Sửa thông tin" : "Thêm"} Đối tác thành công  `,
-        });
+        message.success(
+          `${isEdit ? "Sửa thông tin" : "Thêm"} Đối tác thành công  `
+        );
         getData(1);
       } catch (err) {
-        notification.error({
-          message: err.message,
-        });
+        message.error(err.message);
       }
     },
     [editingItem, getData]
@@ -72,14 +66,10 @@ const Partner = () => {
     try {
       await remove(removeId, role);
       setRemoveId(null);
-      notification.success({
-        message: "Xoá đối tác thành công!",
-      });
+      message.success("Xoá đối tác thành công!");
       getData(1);
     } catch (err) {
-      notification.error({
-        message: err.message,
-      });
+      message.error(err.message);
     }
   }, [removeId, role, getData]);
 
@@ -190,7 +180,8 @@ const Partner = () => {
         <Col span={12}>
           <Search
             placeholder="Search"
-            onSearch={(value) => setSearch(value)}
+            onSearch={(value) => setSearch(value.trim())}
+            onChange={(e) => getData(1, role, e.target.value.trim())}
             enterButton
           />
         </Col>
@@ -208,7 +199,6 @@ const Partner = () => {
             pagination={pagination}
             onChange={onTableChange}
             rowClassName={(record) => record.isDeleted && "table-hidden"}
-            // rowClassName={(record) => !record.enabled && "disabled-row"}
           />
         </Col>
       </Row>

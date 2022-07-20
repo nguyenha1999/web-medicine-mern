@@ -1,4 +1,5 @@
 import { atom } from "recoil";
+import { enCodeBase64 } from "../../until/helper";
 import * as key from "./atom";
 
 export const chemistry = atom({
@@ -36,7 +37,10 @@ export const UserInfoAtom = atom({
   effects_UNSTABLE: [
     ({ onSet }) => {
       onSet((data) => {
-        localStorage.setItem("medicine-user-info", JSON.stringify(data));
+        localStorage.setItem(
+          "vnd-medicine-info",
+          enCodeBase64(JSON.stringify(data))
+        );
       });
     },
   ],

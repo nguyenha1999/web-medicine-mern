@@ -1,20 +1,20 @@
 const Users = require("../../model/user");
-const UserHistory = require("../../model/userHistory");
+
 const crypto = require("crypto");
 
 module.exports = {
-  get_index: function (role) {
-    if (role === "admin") {
-      return Users.find();
+  get_index: async function (role, search) {
+    if (search) {
+      const searchValue = await Users.find({
+        $or: [{ code: search }, { username: search }, { role: search }],
+      }).sort({ createdOn: -1 });
+      return searchValue;
     }
-    // return User.find({}, "-hashedPass -salt")
-    //   .populate({
-    //     path: "roles",
-    //     match: { activated: true },
-    //     select: "title description",
-    //   })
-    //   .lean();
-    return Users.find({ activated: true });
+    if (role === "admin") {
+      return await Users.find().sort({ createdOn: -1 });
+    }
+
+    return await Users.find({ isDeleted: false }).sort({ createdOn: -1 });
   },
   get_profile: function (email) {
     return Users.find({ email: email });
@@ -33,9 +33,8 @@ module.exports = {
     role
   ) {
     const isExit = await Users.exists({ email });
-    console.log(isExit);
     if (isExit) {
-      return { error: true, message: "Email đã tồn tại" };
+      return await { error: true, message: "Email đã tồn tại" };
     }
     return await Users.create({
       email: email,
@@ -47,6 +46,26 @@ module.exports = {
       tel: tel,
       role: role,
       activated: true,
+    });
+  },
+  put_index: function (
+    _id,
+    branch,
+    code,
+    email,
+    value,
+    password,
+    role,
+    username
+  ) {
+    return Users.findByIdAndUpdate(_id, {
+      branch,
+      username,
+      code,
+      email,
+      value,
+      role,
+      password,
     });
   },
   delete_index: function (id, role) {

@@ -1,4 +1,4 @@
-import { Form, Input, Modal, notification } from "antd";
+import { Form, Input, message, Modal } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { getSelectors } from "../../api/chemistry";
 import ChemistrySelector from "./ChemistrySelector";
@@ -13,9 +13,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
       const res = await getSelectors();
       setChemistryOptions(res.data);
     } catch (err) {
-      notification.error({
-        message: err.message,
-      });
+      message.error(err.message);
     }
   }, []);
 
@@ -47,6 +45,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
       nameCompany: item.nameCompany,
       address: item.address,
       hotline: item.hotline,
+      product: item.products,
     });
 
     setData(itemData);
@@ -106,7 +105,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
       await onOk(result);
       // reset();
     } catch (err) {
-      notification.error({ message: err.message });
+      message.error(err.message);
     }
     setConfirmLoading(false);
   }, [onOk, data]);
@@ -125,7 +124,17 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
       }}
       confirmLoading={confirmLoading}
     >
-      <Form form={form} name="control-hooks" onFinish={onFinish}>
+      <Form
+        form={form}
+        name="control-hooks"
+        onFinish={onFinish}
+        labelCol={{
+          span: 5,
+        }}
+        wrapperCol={{
+          span: 22,
+        }}
+      >
         <Form.Item
           name="nameCompany"
           label="Tên Đối Tác"
@@ -152,11 +161,7 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
             },
           ]}
         >
-          <Input
-            style={{ marginLeft: "26px", width: "377px" }}
-            name="address"
-            onChange={handlerInputChange}
-          />
+          <Input name="address" onChange={handlerInputChange} />
         </Form.Item>
         <Form.Item
           name="hotline"
@@ -166,32 +171,23 @@ const ExportDetail = ({ item, onOk, onCancel }) => {
               required: true,
               message: "Vui lòng nhập Hotline!",
             },
-            {
-              min: 10,
-              message: "Số điện thoại phải dài ít nhất 10 chữ số!!",
-            },
           ]}
         >
           <Input
             placeholder="Số lượng"
-            style={{ marginLeft: "26px", width: "377px" }}
             name="hotline"
             onChange={handlerInputChange}
+            maxLength={10}
           />
         </Form.Item>
-        <Form.Item
-          name="products"
-          label="Sản Phẩm"
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng nhập tên Sản Phẩm",
-            },
-          ]}
-        >
+        <Form.Item label="Hotline">
           <ChemistrySelector
             options={chemistryOptions}
-            value={data?.products?.map((product) => product?._id)}
+            value={
+              Array.isArray(data?.products) &&
+              data?.products?.length > 0 &&
+              data?.products?.map((product) => product._id)
+            }
             onChange={onChangeSelector}
           />
         </Form.Item>

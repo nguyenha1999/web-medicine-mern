@@ -1,6 +1,6 @@
-import { Button, Card, Col, Input, Modal, notification, Row } from "antd";
-import { useEffect, useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Button, Card, Col, Input, message, Modal, Row } from "antd";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { create } from "../../api/recipe";
 import ChildrenTable from "./ChildrenTable";
@@ -16,20 +16,13 @@ const EditNodeModal = ({
 }) => {
   const [data, setData] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const codeRef = useRef();
 
-  const { register, setValue, control } = useForm();
+  const { register } = useForm();
 
   const [newChild, setNewChild] = useState({
     name: "",
     code: "",
     ratio: 0,
-  });
-
-  const childName = useWatch({
-    name: "childname",
-    control,
-    defaultValue: undefined,
   });
 
   const params = useParams();
@@ -80,7 +73,7 @@ const EditNodeModal = ({
 
   const isRoot = node && !node.depth;
 
-  const disabled = node && node.data.code.length === 1;
+  const disabled = node && node?.data?.code?.length === 1;
 
   const onConfirm = async () => {
     setConfirmLoading(true);
@@ -88,8 +81,7 @@ const EditNodeModal = ({
       const next = isRoot ? onOkRoot : onOk;
       await next(data);
     } catch (err) {
-      console.log("e");
-      notification.error({ message: err.message });
+      message.error(err.message);
     }
     setConfirmLoading(false);
   };
@@ -202,6 +194,7 @@ const EditNodeModal = ({
                   name="code"
                   {...register("code")}
                   value={data?.code || ""}
+                  disabled
                   onChange={(e) => changeData({ code: e.target.value })}
                 />
 

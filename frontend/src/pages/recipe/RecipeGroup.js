@@ -2,7 +2,7 @@ import { LinearGradient } from "@visx/gradient";
 import { Group } from "@visx/group";
 import { hierarchy, Tree } from "@visx/hierarchy";
 import { LinkVertical } from "@visx/shape";
-import { notification } from "antd";
+import { message } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { create, getById, remove, update } from "../../api/recipe";
@@ -13,10 +13,10 @@ const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
 function convertChem(chem) {
   if (
-    chem.children &&
-    Array.isArray(chem.children) &&
-    chem.children.length &&
-    chem.code.length > 1
+    chem?.children &&
+    Array?.isArray(chem.children) &&
+    chem?.children.length &&
+    chem?.code.length > 2
   ) {
     let flatChildren = [];
 
@@ -156,14 +156,13 @@ const RecipeGroup = ({
 
       removeNewChildrenId(data);
 
-      await update(data);
+      await update({ data, ...values });
       await getData();
 
       forceUpdate();
       setEditingNode(null);
     } catch (err) {
-      console.error(err);
-      notification.error({ message: err.message });
+      message.error(err.message);
     }
   };
 
@@ -186,8 +185,7 @@ const RecipeGroup = ({
       forceUpdate();
       setEditingNode(null);
     } catch (err) {
-      console.error(err);
-      notification.error({ message: err.message });
+      message.error(err.message);
     }
   };
 

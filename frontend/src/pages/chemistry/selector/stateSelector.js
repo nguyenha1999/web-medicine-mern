@@ -1,13 +1,15 @@
 import { Select } from "antd";
+import React, { memo } from "react";
 
 const { Option } = Select;
 
 const options = [
-  { text: "Admin", value: "admin" },
-  { text: "Staff", value: "staff" },
+  { text: "Trạng thái rắn", value: "Trạng thái rắn" },
+  { text: "Trạng thái lỏng", value: "Trạng thái lỏng" },
+  { text: "Trạng thái khí", value: "Trạng thái khí" },
 ];
 
-const RoleSelector = ({ value, onChange }) => {
+export default memo(({ value, onChange }) => {
   return (
     <Select placeholder="Select type" value={value} onChange={onChange}>
       {options.map((option) => (
@@ -17,6 +19,4 @@ const RoleSelector = ({ value, onChange }) => {
       ))}
     </Select>
   );
-};
-
-export default RoleSelector;
+});

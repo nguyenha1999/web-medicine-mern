@@ -1,10 +1,9 @@
 import {
-  CopyOutlined,
   DeleteOutlined,
   EditOutlined,
   FilePdfOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Input, message, notification, Row, Table } from "antd";
+import { Button, Col, Input, message, Row, Table } from "antd";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
@@ -64,9 +63,7 @@ const Import = () => {
         );
         getData(1);
       } catch (err) {
-        notification.error({
-          message: err.message,
-        });
+        message.error(err.message);
       }
     },
     [editingItem, getData]
@@ -77,14 +74,12 @@ const Import = () => {
     try {
       await remove(removeId, role);
       setRemoveId(null);
-      notification.success({
+      message.success({
         message: "Remove bill successfully",
       });
       getData(1);
     } catch (err) {
-      notification.error({
-        message: err.message,
-      });
+      message.error(err.message);
     }
   }, [removeId, role, getData]);
 
@@ -215,19 +210,6 @@ const Import = () => {
                 onClick={() => print(record)}
               >
                 Print
-              </Button>
-            </Col>
-            <Col span="auto">
-              <Button
-                style={{
-                  background: "#62a73b",
-                  color: "#fff",
-                  borderRadius: "4px",
-                }}
-                size="small"
-                icon={<CopyOutlined />}
-              >
-                History
               </Button>
             </Col>
             <Col span="auto">
