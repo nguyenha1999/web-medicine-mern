@@ -1,13 +1,13 @@
 import { axiosClient } from "./axiosClient";
 
-export const get = (page, role, limit, search, isDescending) =>
+export const get = (page, role, search) =>
   axiosClient.get("root/user", {
-    params: { page, role, limit, search, isDescending },
+    params: { page, role, search },
   });
 
 export const create = (data) => axiosClient.post("/root/user", data);
 
-export const update = (data) => axiosClient.put(`/users/${data._id}`, data);
+export const update = (data) => axiosClient.put(`root/user`, data);
 
 export const remove = (id, role) =>
   axiosClient.delete(`root/user/?id=${id}&role=${role}`);

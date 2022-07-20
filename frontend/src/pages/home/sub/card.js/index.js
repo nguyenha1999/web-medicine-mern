@@ -8,7 +8,6 @@ const startOfMonth = moment().clone().startOf("month").format("YYYY-MM-DD");
 function CardOverview(props) {
   const [total, setTotal] = useState(0);
   const [ratio, setRatio] = useState(0);
-  console.log(props);
 
   if (props.data?.length) {
     const dataCurentMonthIndex = props.data.findIndex(

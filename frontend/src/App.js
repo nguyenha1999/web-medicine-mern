@@ -5,6 +5,7 @@ import "./App.css";
 import { UserInfoAtom } from "./recoils/Atoms";
 import { getRoutes } from "./routes/route-setup";
 import Suspense from "./routes/Routers";
+import { deCodeBase64 } from "./until/helper";
 
 const Recipe = lazy(() => import("./pages/recipe"));
 const Login = lazy(() => import("./pages/login"));
@@ -15,11 +16,10 @@ function App() {
   useEffect(() => {
     let userInfo = localStorage.getItem("vnd-medicine-info");
     if (typeof userInfo === "string") {
-      userInfo = JSON.parse(userInfo);
+      userInfo = JSON.parse(deCodeBase64(userInfo));
       setUser(userInfo);
     }
   }, [setUser]);
-
   const routes = getRoutes(user?.role);
 
   return (

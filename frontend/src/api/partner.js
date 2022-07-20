@@ -1,8 +1,8 @@
 import { axiosClient } from "./axiosClient";
 
-export const get = (page, role, limit, search, isDescending) =>
+export const get = (page, role, search) =>
   axiosClient.get("root/partner", {
-    params: { page, role, limit, search, isDescending },
+    params: { page, role, search },
   });
 
 export const create = (data) => axiosClient.post("root/partner", data);

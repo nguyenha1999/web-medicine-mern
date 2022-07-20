@@ -45,7 +45,6 @@ function getDataCurentMonth(data, key) {
   return [];
 }
 
-console.log();
 function fillDataChart(data) {
   return {
     export: getDataCurentMonth(data.exportTrack, "count"),
@@ -80,7 +79,9 @@ const Home = () => {
           <Col span={6}>
             <CardOverview
               title={"Số đơn nhập"}
-              icon={<BookFilled style={{ fontSize: 30, color: "#16a085" }} />}
+              icon={
+                <DownloadOutlined style={{ fontSize: 30, color: "#16a085" }} />
+              }
               action={"document"}
               data={importTotal && importTotal[0].countI}
             />
@@ -88,7 +89,9 @@ const Home = () => {
           <Col span={6}>
             <CardOverview
               title={"Số đơn xuất"}
-              icon={<HddFilled style={{ fontSize: 30, color: "#2980b9" }} />}
+              icon={
+                <UploadOutlined style={{ fontSize: 30, color: "#2980b9" }} />
+              }
               action={"procedure"}
               data={exportTotal && exportTotal[0].countE}
             />
@@ -96,9 +99,7 @@ const Home = () => {
           <Col span={6}>
             <CardOverview
               title={"Doanh thu"}
-              icon={
-                <UploadOutlined style={{ fontSize: 30, color: "#27ae60" }} />
-              }
+              icon={<HddFilled style={{ fontSize: 30, color: "#27ae60" }} />}
               action={"upload"}
               data={exportTotal && exportTotal[0].totalExported}
             />
@@ -106,9 +107,7 @@ const Home = () => {
           <Col span={6}>
             <CardOverview
               title={"Lợi nhuận"}
-              icon={
-                <DownloadOutlined style={{ fontSize: 30, color: "#e67e22" }} />
-              }
+              icon={<BookFilled style={{ fontSize: 30, color: "#e67e22" }} />}
               action={"download"}
               data={dataCarts.y}
             />

@@ -14,12 +14,7 @@ const options = [
 
 const ServiceSelector = ({ value, onChange }) => {
   return (
-    <Select
-      style={{ width: "360px", marginLeft: "35px" }}
-      placeholder="Select type"
-      value={value}
-      onChange={onChange}
-    >
+    <Select placeholder="Select type" value={value} onChange={onChange}>
       {options.map((option) => (
         <Option key={option.text} value={option.value}>
           {option.text}

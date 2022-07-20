@@ -1,10 +1,9 @@
 import {
-  CopyOutlined,
   DeleteOutlined,
   EditOutlined,
   FilePdfOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Input, message, notification, Row, Table } from "antd";
+import { Button, Col, Input, message, Row, Table } from "antd";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
@@ -25,7 +24,7 @@ const Export = () => {
   const [data, setData] = useRecoilState(exports);
   const [loading, setLoading] = useState(false);
   const userInfo = useRecoilValue(UserInfoAtom);
-  const { role } = userInfo;
+  const { role, code } = userInfo;
 
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState({
@@ -41,13 +40,14 @@ const Export = () => {
       setLoading(true);
 
       // get data
-      const { current, pageSize } = pagination;
-      const res = await get(page, role || current, pageSize, search);
-      setData(res?.data || []);
+
+      const res = await get(page, role, search);
+
+      setData(res?.data);
 
       setLoading(false);
     },
-    [pagination, role, search, setData]
+    [role, search, setData]
   );
 
   const updateData = useCallback(
@@ -78,9 +78,7 @@ const Export = () => {
       message.success("Xoá đơn nhập thành công");
       getData(1);
     } catch (err) {
-      notification.error({
-        message: err.message,
-      });
+      message.error(err.message);
     }
   }, [removeId, role, getData]);
 
@@ -102,7 +100,7 @@ const Export = () => {
 
     const timeType = isExport ? "Export Time" : "Import Time";
     const time = `${timeType}: ${moment(createdAt).format(FULL_DATE_FORMAT)}`;
-    const staffId = `StaffID: 621126`;
+    const staffId = `StaffID:${code}`;
     const staffName = `StaffName: Le Ngoc Ha`;
     const sumValue = `SumValue: ${sum}`;
 
@@ -208,19 +206,6 @@ const Export = () => {
             <Col span="auto">
               <Button
                 style={{
-                  background: "#62a73b",
-                  color: "#fff",
-                  borderRadius: "4px",
-                }}
-                size="small"
-                icon={<CopyOutlined />}
-              >
-                History
-              </Button>
-            </Col>
-            <Col span="auto">
-              <Button
-                style={{
                   backgroundColor: "#f56a00",
                   color: "#fff",
                   borderRadius: "4px",
@@ -278,7 +263,7 @@ const Export = () => {
         <Col span={12} style={style.mb2}>
           <Search
             placeholder="Tìm kiếm"
-            onSearch={(value) => setSearch(value)}
+            onSearch={(value) => setSearch(value.trim())}
             onChange={(e) => getData(1, role, e.target.value)}
             enterButton
           />
